@@ -1,0 +1,30 @@
+@startuml
+!pragma layout smetana
+
+Class Vulnerability{
+- String cveId
+- LocalDate publishedDate
+- String status
+- String description
+- Int cvssScore
+- String severity
+ -String cweCategory
+- List affectedProducts
+}
+
+Class Asserts {
+- long assertId
+- String softwareName
+- int softwareVersion
+
+}
+
+Class Users {
+- long userId
+- String userName
+- String userPassword
+- String role
+}
+
+
+@enduml
