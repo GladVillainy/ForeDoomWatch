@@ -23,6 +23,7 @@ public abstract class GenericDAO<T, ID> {
         try{
             entityManager.persist(t);
             entityManager.getTransaction().commit();
+            return t;
         } finally {
             emf.close();
         }
