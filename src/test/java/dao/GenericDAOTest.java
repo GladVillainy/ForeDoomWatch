@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JacksonInject;
 import config.HibernateTestConfig;
 import entities.Host;
 import entities.User;
+import exceptions.ApiException;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
 
@@ -53,16 +54,6 @@ class GenericDAOTest {
         User fetchedUser2 = userDAO.read(user2.getUserId());
         assertThat(fetchedUser2.getUserId(), is(user2.getUserId()));
 
-        //Testing user3
-        User user3 = new User("Jon@mail.com", "Jon", "Ek14");
-
-        userDAO.create(user3);
-        user3.getUserId();
-        assertThat(user3.getUserId(), notNullValue());
-        User fetchedUser3 = userDAO.read(user3.getUserId());
-        assertThat(fetchedUser3.getUserId(), is(user3.getUserId()));
-
-
         //Testing that user 1 is not user 2
         assertThat(fetchedUser1, not(user2));
 
@@ -91,7 +82,6 @@ class GenericDAOTest {
 
         /////// GENERIC TEST
 
-        //Testing generics
         assertThat(fetchedHost1, not(fetchedUser1));
 
     }
@@ -99,14 +89,86 @@ class GenericDAOTest {
     @Test
     void update() {
 
+        //Make user 1
+        User user1 = new User("Lucas@mail.com", "Lucas", "Ek12");
+
+        //Test user 1
+        userDAO.create(user1);
+        user1.getUserId();
+        assertThat(user1.getUserId(), notNullValue());
+        User fetchedUser1 = userDAO.read(user1.getUserId());
+        assertThat(fetchedUser1.getUserId(), is(user1.getUserId()));
+
+        //Update user
+        fetchedUser1.setEmail("LucasUpdated@mail");
+        fetchedUser1.setUsername("LucasUpdated");
+        fetchedUser1.setPassword("ek12Updated");
+        userDAO.update(fetchedUser1);
+        assertThat(fetchedUser1.getUserId(), notNullValue());
+
+        //Get updated user
+        User fetchedUser1Updated = userDAO.read(fetchedUser1.getUserId());
+        assertThat(fetchedUser1Updated.getUserId(), is(fetchedUser1.getUserId()));
+
+        //Compare user
+        //Not the same
+        assertThat(fetchedUser1, not(fetchedUser1Updated));
+        //Same ID
+        assertThat(fetchedUser1.getUserId(), is(fetchedUser1Updated.getUserId()));
+
     }
 
     @Test
     void read() {
+        //make user 1
+        User user1 = new User("Lucas@mail.com", "Lucas", "Ek12");
+        userDAO.create(user1);
+        user1.getUserId();
+        assertThat(user1.getUserId(), notNullValue());
+
+        //Find user 1
+        User fetchedUser1 = userDAO.read(user1.getUserId());
+        assertThat(fetchedUser1.getUserId(), is(user1.getUserId()));
+
+        //Make user2
+        User user2 = new User("Thomas@mail.com", "Thomas", "Ek13");
+
+        userDAO.create(user2);
+        user2.getUserId();
+        assertThat(user2.getUserId(), notNullValue());
+
+        //Find user 1
+        User fetchedUser2 = userDAO.read(user2.getUserId());
+        assertThat(fetchedUser2.getUserId(), is(user2.getUserId()));
+
+
+        //Compare
+        assertThat(fetchedUser1, not(user2));
+        assertThat(user2, not(user1));
+
     }
 
     @Test
     void delete() {
+        //make user 1
+        User user1 = new User("Lucas@mail.com", "Lucas", "Ek12");
+        userDAO.create(user1);
+        user1.getUserId();
+        assertThat(user1.getUserId(), notNullValue());
+
+        //Find user 1
+        User fetchedUser1 = userDAO.read(user1.getUserId());
+        assertThat(fetchedUser1.getUserId(), is(user1.getUserId()));
+
+        //Delete user 1
+        userDAO.delete(fetchedUser1.getUserId());
+
+        //find user 1
+        User fetchedDeletedUser1 = userDAO.read(user1.getUserId());
+
+        //Compare
+        assertThat(fetchedDeletedUser1, nullValue());
+
     }
 
     @Test

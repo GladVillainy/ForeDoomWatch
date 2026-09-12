@@ -1,10 +1,8 @@
 package dao;
 
 import config.HibernateConfig;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.TypedQuery;
+import exceptions.ApiException;
+import jakarta.persistence.*;
 
 import java.util.List;
 
@@ -39,23 +37,25 @@ public class GenericDAO<T, ID> {
 
     public T update(T t) {
         EntityManager entityManager = emf.createEntityManager();
-
         entityManager.getTransaction().begin();
-
-        try{
+        try {
             T merged = entityManager.merge(t);
             entityManager.getTransaction().commit();
             return merged;
         } finally {
             entityManager.close();
         }
-
     }
 
     public T read(ID id) {
         EntityManager entityManager = emf.createEntityManager();
         //Find entity
-        try {return entityManager.find(entityClass, id);}
+        try {
+            return entityManager.find(entityClass, id);
+        }
+        catch (PersistenceException e) {
+            throw new ApiException(500, "Failed to fetch" + e.getMessage());
+        }
         //Close entityManger
         finally {entityManager.close();}
 
