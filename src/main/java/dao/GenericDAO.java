@@ -8,12 +8,20 @@ import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 
-public abstract class GenericDAO<T, ID> {
-    private EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
+public class GenericDAO<T, ID> {
+    private EntityManagerFactory emf;
     private Class<T> entityClass;
 
-    public GenericDAO(Class<T> entityClass) {this.entityClass = entityClass;}
+    public GenericDAO(EntityManagerFactory emf, Class<T> entityClass) {
+        this.emf = emf;
+        this.entityClass = entityClass;
+    }
 
+    public GenericDAO(EntityManagerFactory emf) {
+        this.emf = emf;
+    }
+
+    public GenericDAO() {}
     //uses finally to insure a close, if an exception occurs.
 
     public T create(T t){
@@ -25,7 +33,7 @@ public abstract class GenericDAO<T, ID> {
             entityManager.getTransaction().commit();
             return t;
         } finally {
-            emf.close();
+            entityManager.close();
         }
     }
 

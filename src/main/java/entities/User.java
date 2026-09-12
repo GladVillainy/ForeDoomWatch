@@ -9,7 +9,7 @@ import lombok.ToString;
 @Entity
 @ToString
 @NoArgsConstructor
-@Getter
+@Getter @Table(name = "users")
 public class User {
 
     @Id
@@ -20,6 +20,12 @@ public class User {
     private String email;
     private String username;
     private String password;
+
+    public User(String email, String username, String password) {
+        this.email = email;
+        this.username = username;
+        this.password = password;
+    }
 
     //Setters
     public void setEmail(String email) {
