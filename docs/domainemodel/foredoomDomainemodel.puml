@@ -1,33 +1,41 @@
 @startuml
 !pragma layout smetana
 
-Class User{
-- username
-- password
+class User {
+  - email
+  - username
+  - passwordHash
 }
 
-Class Host{
-- hostName
-- description
+class Host {
+  - name
+  - description
 }
 
-Class Software{
-- softwareName
-- version
+class Software {
+  - name
+  - version
 }
 
-Class Finding{
-- status
-- detectedAt
-- updatedAt
-- resovledAt
+class Finding {
+  - status : FindingStatus
+  - detectedAt
+  - updatedAt
+  - resolvedAt
 }
 
-Class Vulnerability{
-- vulnerabilityDescription
-- cvssScore
-- Severity
-- cwe_catagory
+class Vulnerability {
+  - cveId
+  - description
+  - cvssScore
+  - cvssVector
+  - severity : Severity
+  - cweCategory
+}
+
+class Reference {
+  - url
+  - source
 }
 
 enum FindingStatus {
@@ -36,12 +44,24 @@ enum FindingStatus {
   RESOLVED
 }
 
+enum Severity {
+  NONE
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
 
-User    "1" *-- "0..*" Host      : owns >
-Host   "1" *-- "0..*" Software   : runs >
-Software "1" *-- "0..*" Finding   : affected by >
-Vulnerability "1" o-- "0..*" Finding : found in >
-Finding ..> FindingStatus
+' --- Kompositioner  ---
+User          "1" *-- "0..*" Host          : owns >
+Host          "1" *-- "0..*" Software      : runs >
+Software      "1" *-- "0..*" Finding       : has >
+Vulnerability "1" *-- "0..*" Reference     : documented by >
 
+' --- Aggregering---
+Vulnerability "1" o-- "0..*" Finding        : identified in >
 
+' --- Dependencies  ---
+Finding       ..> FindingStatus
+Vulnerability ..> Severity
 @enduml
