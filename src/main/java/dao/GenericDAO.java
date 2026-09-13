@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 public class GenericDAO<T, ID> {
-    private EntityManagerFactory emf;
+    private final EntityManagerFactory emf;
     private Class<T> entityClass;
 
     public GenericDAO(EntityManagerFactory emf, Class<T> entityClass) {
@@ -18,21 +18,18 @@ public class GenericDAO<T, ID> {
     public GenericDAO(EntityManagerFactory emf) {
         this.emf = emf;
     }
-
-    public GenericDAO() {}
     //uses finally to insure a close, if an exception occurs.
 
     public T create(T t){
-        EntityManager entityManager = emf.createEntityManager();
-
-        entityManager.getTransaction().begin();
-        try{
+        if (t == null) {
+            throw new ApiException(400, entityClass.getSimpleName() + " is required");
+        }
+        try(EntityManager entityManager = emf.createEntityManager();){
+            entityManager.getTransaction().begin();
             entityManager.persist(t);
             entityManager.getTransaction().commit();
-            return t;
-        } finally {
-            entityManager.close();
         }
+        return t;
     }
 
     public T update(T t) {

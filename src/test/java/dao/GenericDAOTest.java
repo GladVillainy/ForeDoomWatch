@@ -6,8 +6,11 @@ import config.HibernateTestConfig;
 import entities.Host;
 import entities.User;
 import exceptions.ApiException;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
+
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -26,8 +29,20 @@ class GenericDAOTest {
     void beforeEach() {
          userDAO = new UserDAO(emf);
          hostDAO = new HostDAO(emf);
+
+
     }
 
+    @BeforeEach
+    void setUp() {
+        EntityManager em = emf.createEntityManager();
+
+        //Clean users
+        em.getTransaction().begin();
+        em.createQuery("DELETE FROM User").executeUpdate();
+        em.getTransaction().commit();
+        em.close();
+    }
     @AfterAll
     void shutdown() {
         emf.close();
@@ -173,5 +188,33 @@ class GenericDAOTest {
 
     @Test
     void readAll() {
+        //Create 3 users
+        User user1 = new User("Lucas@mail.com", "Lucas", "Ek12");
+        User user2 = new User("Thomas@mail.com", "ThomasH", "Ek13");
+        User user3 = new User("Jon@mail.com", "Jon", "Ek13");
+
+        userDAO.create(user1);
+        userDAO.create(user2);
+        userDAO.create(user3);
+
+        //Validate that they exist
+        //Find user 1
+        User fetchedUser1 = userDAO.read(user1.getUserId());
+        assertThat(fetchedUser1.getUserId(), is(user1.getUserId()));
+        //Find user 2
+        User fetchedUser2 = userDAO.read(user2.getUserId());
+        assertThat(fetchedUser2.getUserId(), is(user2.getUserId()));
+        //Find user 3
+        User fetchedUser3 = userDAO.read(user3.getUserId());
+        assertThat(fetchedUser3.getUserId(), is(user3.getUserId()));
+
+        //Get users
+        List<User> userList = userDAO.readAll();
+        //Test the actual size
+        assertThat(userList, hasSize(3) );
+        //Test that it can fail
+        assertThat(userList, not(hasSize(4)));
+        assertThat(userList, not(hasSize(2)));
+
     }
 }
