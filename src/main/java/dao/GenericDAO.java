@@ -18,9 +18,9 @@ public class GenericDAO<T, ID> {
     public GenericDAO(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    //uses finally to insure a close, if an exception occurs.
 
     public T create(T t) {
+        //handles if T is missing
         if (t == null) {
             throw new ApiException(400, entityClass.getSimpleName() + " is required");
         }
@@ -30,6 +30,7 @@ public class GenericDAO<T, ID> {
                 entityManager.persist(t);
                 entityManager.getTransaction().commit();
             } catch (PersistenceException e) {
+                //Rollback to prevent damage to database
                 if (entityManager.getTransaction().isActive()) {
                     entityManager.getTransaction().rollback();
                 }
@@ -39,16 +40,17 @@ public class GenericDAO<T, ID> {
                 if (entityManager.getTransaction().isActive()) {
                     entityManager.getTransaction().rollback();
                 }
-                throw new RuntimeException(e);
             }
         }
         return t;
     }
 
     public T update(T t) {
+        //handles if t is missing
         if (t == null) {
             throw new ApiException(400, entityClass.getSimpleName() + " id is required");
         }
+        T merged = null;
         try (EntityManager entityManager = emf.createEntityManager()) {
             entityManager.getTransaction().begin();
             //try { question for teacher, how to find generic id?
@@ -57,7 +59,7 @@ public class GenericDAO<T, ID> {
             //      throw new ApiException(404, "Study not found");
             //  }
             try {
-                T merged = entityManager.merge(t);
+                merged = entityManager.merge(t);
                 entityManager.getTransaction().commit();
                 return merged;
             } catch (PersistenceException e) {
@@ -70,9 +72,9 @@ public class GenericDAO<T, ID> {
                 if (entityManager.getTransaction().isActive()) {
                     entityManager.getTransaction().rollback();
                 }
-                throw new RuntimeException(e);
             }
         }
+        return merged;
     }
 
     public T read(ID id) {
@@ -85,7 +87,7 @@ public class GenericDAO<T, ID> {
             if (t != null) {
                 return t;
             }
-            throw new ApiException(404, entityClass.getSimpleName() + "could not be found");
+            throw new ApiException(404, entityClass.getSimpleName() + " could not be found");
         } catch (PersistenceException e) {
             throw new ApiException(500, "Failed to fetch with error message: " + e.getMessage());
         }

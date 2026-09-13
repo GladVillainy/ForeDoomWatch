@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -176,13 +177,16 @@ class GenericDAOTest {
         assertThat(fetchedUser1.getUserId(), is(user1.getUserId()));
 
         //Delete user 1
-        userDAO.delete(fetchedUser1.getUserId());
+       Boolean isDeleted = userDAO.delete(fetchedUser1.getUserId());
 
-        //find user 1
-        User fetchedDeletedUser1 = userDAO.read(user1.getUserId());
+       //find user 1
+        ApiException exception = assertThrows(ApiException.class, () -> {
+            userDAO.read(user1.getUserId());
+        });
 
         //Compare
-        assertThat(fetchedDeletedUser1, nullValue());
+        assertThat(exception.getCode(), is(404));
+        assertThat(isDeleted, is(true));
 
     }
 
