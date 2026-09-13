@@ -45,29 +45,47 @@ public class GenericDAO<T, ID> {
     }
 
     public T update(T t) {
-        EntityManager entityManager = emf.createEntityManager();
-        entityManager.getTransaction().begin();
-        try {
-            T merged = entityManager.merge(t);
-            entityManager.getTransaction().commit();
-            return merged;
-        } finally {
-            entityManager.close();
+        if (t == null){
+            throw new ApiException(400, entityClass.getSimpleName() + " id is required");
+        }
+        try (EntityManager entityManager = emf.createEntityManager()) {
+            entityManager.getTransaction().begin();
+            //try { question for teacher, how to find generic id?
+              //  T existing = entityManager.find(T.class, T.getId());
+              //  if (existing == null) {
+              //      throw new ApiException(404, "Study not found");
+              //  }
+            try {
+                T merged = entityManager.merge(t);
+                entityManager.getTransaction().commit();
+                return merged;
+            } catch (PersistenceException e) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                throw new ApiException(500, "Update " + entityClass.getSimpleName()
+                        + " failed with error message: " + e.getMessage());
+            } catch (RuntimeException e) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                } throw new RuntimeException(e);
+            }
         }
     }
 
     public T read(ID id) {
-        EntityManager entityManager = emf.createEntityManager();
-        //Find entity
-        try {
-            return entityManager.find(entityClass, id);
+        if (id == null){
+            throw new ApiException(400, entityClass.getSimpleName() + " id is required");
         }
-        catch (PersistenceException e) {
-            throw new ApiException(500, "Failed to fetch" + e.getMessage());
+       try(EntityManager entityManager = emf.createEntityManager()){
+           //Find entity
+           T t = entityManager.find(entityClass, id);
+           if(t != null){
+               return t;
+           } throw new ApiException(404, entityClass.getSimpleName() + "could not be found");
+       } catch (PersistenceException e) {
+            throw new ApiException(500, "Failed to fetch with error message: " + e.getMessage());
         }
-        //Close entityManger
-        finally {entityManager.close();}
-
     }
 
     public void delete(ID id){
