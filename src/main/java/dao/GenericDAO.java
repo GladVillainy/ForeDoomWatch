@@ -24,10 +24,22 @@ public class GenericDAO<T, ID> {
         if (t == null) {
             throw new ApiException(400, entityClass.getSimpleName() + " is required");
         }
-        try(EntityManager entityManager = emf.createEntityManager();){
+        try(EntityManager entityManager = emf.createEntityManager();) {
             entityManager.getTransaction().begin();
-            entityManager.persist(t);
-            entityManager.getTransaction().commit();
+            try {
+                entityManager.persist(t);
+                entityManager.getTransaction().commit();
+            } catch (PersistenceException e) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                throw new ApiException(500, "Create " + entityClass.getSimpleName()
+                        + " failed with error message: " + e.getMessage());
+            } catch (RuntimeException e) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                } throw new RuntimeException(e);
+            }
         }
         return t;
     }
