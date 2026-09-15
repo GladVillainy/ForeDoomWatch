@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Host {
+public class Host implements IEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "host_id")
     private long hostId;
@@ -36,4 +36,9 @@ public class Host {
     @JoinColumn(name = "user_user_id")
     private User user;
     public void setUser(User user) {this.user = user;}
+
+    @Override
+    public Long getID() {
+        return hostId;
+    }
 }

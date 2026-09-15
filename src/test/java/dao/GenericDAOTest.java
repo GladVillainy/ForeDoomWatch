@@ -28,8 +28,8 @@ class GenericDAOTest {
 
     @BeforeEach
     void beforeEach() {
-         userDAO = new UserDAO(emf);
-         hostDAO = new HostDAO(emf);
+        userDAO = new UserDAO(emf);
+        hostDAO = new HostDAO(emf);
 
 
     }
@@ -44,6 +44,7 @@ class GenericDAOTest {
         em.getTransaction().commit();
         em.close();
     }
+
     @AfterAll
     void shutdown() {
         emf.close();
@@ -104,7 +105,6 @@ class GenericDAOTest {
 
     @Test
     void update() {
-
         //Make user 1
         User user1 = new User("Lucas@mail.com", "Lucas", "Ek12");
 
@@ -115,23 +115,30 @@ class GenericDAOTest {
         User fetchedUser1 = userDAO.read(user1.getUserId());
         assertThat(fetchedUser1.getUserId(), is(user1.getUserId()));
 
-        //Update user
+        //Update user 1
         fetchedUser1.setEmail("LucasUpdated@mail");
         fetchedUser1.setUsername("LucasUpdated");
         fetchedUser1.setPassword("ek12Updated");
         userDAO.update(fetchedUser1);
         assertThat(fetchedUser1.getUserId(), notNullValue());
 
-        //Get updated user
+        //Get updated user 1
         User fetchedUser1Updated = userDAO.read(fetchedUser1.getUserId());
         assertThat(fetchedUser1Updated.getUserId(), is(fetchedUser1.getUserId()));
 
-        //Compare user
+        //Compare user 1 updated to non updated
         //Not the same
         assertThat(fetchedUser1, not(fetchedUser1Updated));
         //Same ID
         assertThat(fetchedUser1.getUserId(), is(fetchedUser1Updated.getUserId()));
 
+
+    }
+
+    @Test
+    void update_withNullUser_throwsApiException() {
+        ApiException ex = assertThrows(ApiException.class, () -> userDAO.update(null));
+        assertThat(ex.getCode(), is(400));
     }
 
     @Test
@@ -177,9 +184,9 @@ class GenericDAOTest {
         assertThat(fetchedUser1.getUserId(), is(user1.getUserId()));
 
         //Delete user 1
-       Boolean isDeleted = userDAO.delete(fetchedUser1.getUserId());
+        Boolean isDeleted = userDAO.delete(fetchedUser1.getUserId());
 
-       //find user 1
+        //find user 1
         ApiException exception = assertThrows(ApiException.class, () -> {
             userDAO.read(user1.getUserId());
         });
@@ -215,7 +222,7 @@ class GenericDAOTest {
         //Get users
         List<User> userList = userDAO.readAll();
         //Test the actual size
-        assertThat(userList, hasSize(3) );
+        assertThat(userList, hasSize(3));
         //Test that it can fail
         assertThat(userList, not(hasSize(4)));
         assertThat(userList, not(hasSize(2)));

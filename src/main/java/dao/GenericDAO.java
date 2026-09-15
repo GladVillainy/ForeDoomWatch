@@ -1,22 +1,18 @@
 package dao;
 
-import config.HibernateConfig;
+import entities.IEntity;
 import exceptions.ApiException;
 import jakarta.persistence.*;
 
 import java.util.List;
 
-public class GenericDAO<T, ID> {
+public class GenericDAO<T extends IEntity, ID> {
     private final EntityManagerFactory emf;
     private Class<T> entityClass;
 
     public GenericDAO(EntityManagerFactory emf, Class<T> entityClass) {
         this.emf = emf;
         this.entityClass = entityClass;
-    }
-
-    public GenericDAO(EntityManagerFactory emf) {
-        this.emf = emf;
     }
 
     public T create(T t) {
@@ -53,25 +49,28 @@ public class GenericDAO<T, ID> {
         T merged = null;
         try (EntityManager entityManager = emf.createEntityManager()) {
             entityManager.getTransaction().begin();
-            //try { question for teacher, how to find generic id?
-            //  T existing = entityManager.find(T.class, T.getId());
-            //  if (existing == null) {
-            //      throw new ApiException(404, "Study not found");
-            //  }
+
             try {
-                merged = entityManager.merge(t);
-                entityManager.getTransaction().commit();
-                return merged;
-            } catch (PersistenceException e) {
-                if (entityManager.getTransaction().isActive()) {
-                    entityManager.getTransaction().rollback();
+                //If id is null
+                T existing = entityManager.find(entityClass, t.getID());
+                if (existing == null) {
+                    throw new ApiException(404, entityClass.getSimpleName() + "' ID could not be found");
+                }try {
+                    merged = entityManager.merge(t);
+                    entityManager.getTransaction().commit();
+                } catch (PersistenceException e) {
+                    if (entityManager.getTransaction().isActive()) {
+                        entityManager.getTransaction().rollback();
+                    }
+                    throw new ApiException(500, "Update " + entityClass.getSimpleName()
+                            + " failed with error message: " + e.getMessage());
+                } catch (RuntimeException e) {
+                    if (entityManager.getTransaction().isActive()) {
+                        entityManager.getTransaction().rollback();
+                    }
                 }
-                throw new ApiException(500, "Update " + entityClass.getSimpleName()
-                        + " failed with error message: " + e.getMessage());
-            } catch (RuntimeException e) {
-                if (entityManager.getTransaction().isActive()) {
-                    entityManager.getTransaction().rollback();
-                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
         return merged;
@@ -119,15 +118,16 @@ public class GenericDAO<T, ID> {
                 //Roll back to prevent potential damage to database
                 if (entityManager.isOpen()) {
                     entityManager.getTransaction().rollback();
-                }throw new ApiException(500, "Deletion of " + entityClass.getSimpleName() +
+                }
+                throw new ApiException(500, "Deletion of " + entityClass.getSimpleName() +
                         " has failed with error message: " + e.getMessage());
             }
         }
         return isDeleted;
     }
 
-    public List<T> readAll(){
-        try( EntityManager entityManager = emf.createEntityManager()) {
+    public List<T> readAll() {
+        try (EntityManager entityManager = emf.createEntityManager()) {
 
             //Select all from class. Simplename converts to string
             String JPQL = "SELECT t FROM " + entityClass.getSimpleName() + " t";
@@ -136,7 +136,7 @@ public class GenericDAO<T, ID> {
                 TypedQuery<T> query = entityManager.createQuery(JPQL, entityClass);
                 List<T> entities = query.getResultList();
                 return entities;
-            } catch (PersistenceException e){
+            } catch (PersistenceException e) {
                 throw new ApiException(500, "Get " + entityClass.getSimpleName()
                         + "has failed with error message" + e.getMessage());
             }

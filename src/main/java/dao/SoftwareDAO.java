@@ -8,8 +8,4 @@ public class SoftwareDAO extends GenericDAO<Software, Long>  {
     public SoftwareDAO(EntityManagerFactory emf, Class<Software> entityClass) {
         super(emf, Software.class);
     }
-
-    public SoftwareDAO(EntityManagerFactory emf) {
-        super(emf);
-    }
 }

@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @Getter @Table(name = "users")
-public class User {
+public class User implements IEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,4 +40,8 @@ public class User {
         this.password = password;
     }
 
+    @Override
+    public Long getID() {
+        return userId;
+    }
 }

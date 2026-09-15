@@ -3,7 +3,7 @@ package entities;
 import jakarta.persistence.*;
 
 @Entity
-public class Software {
+public class Software implements IEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "software_id")
     private long softwareId;
@@ -23,4 +23,9 @@ public class Software {
     public Host getHost() {return host;}
 
     public void setHost(Host host) {this.host = host;}
+
+    @Override
+    public Long getID() {
+        return softwareId;
+    }
 }

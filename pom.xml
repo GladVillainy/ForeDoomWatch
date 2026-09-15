@@ -117,6 +117,14 @@
             <artifactId>slf4j-api</artifactId>
             <version>${org.slf4j}</version>
         </dependency>
+
+        <!--  Jackson JSON converter/reader   -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.22.2</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 

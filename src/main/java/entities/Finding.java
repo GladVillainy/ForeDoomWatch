@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 
 @Entity @Getter @ToString
 @NoArgsConstructor
-public class Finding {
+public class Finding implements IEntity {
     @Id @Column(name = "finding_id")
     private Long findingID;
 
@@ -52,4 +52,8 @@ public class Finding {
     }
 
 
+    @Override
+    public Long getID() {
+        return findingID;
+    }
 }
