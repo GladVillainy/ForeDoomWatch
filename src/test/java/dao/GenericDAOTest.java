@@ -131,8 +131,6 @@ class GenericDAOTest {
         assertThat(fetchedUser1, not(fetchedUser1Updated));
         //Same ID
         assertThat(fetchedUser1.getUserId(), is(fetchedUser1Updated.getUserId()));
-
-
     }
 
     @Test
