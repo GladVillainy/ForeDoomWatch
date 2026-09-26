@@ -12,23 +12,23 @@ import java.net.http.HttpResponse;
 
 public class APIUtils<T> {
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public String readAPI(String url) {
+    public String readAPI(String apiKey, String search) {
+        String url = "https://services.nvd.nist.gov/rest/json/cves/2.0"
+                + "?keywordSearch=" + search
+                + "&resultsPerPage=2";
         try {
-            // Create an HttpClient instance
             HttpClient client = HttpClient.newHttpClient();
 
-            // Create a request
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(url))
                     .GET()
+                    .header("apiKey", apiKey)
                     .build();
 
-            // Send the request and get the response
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            // Check the status code and print the response
             if (response.statusCode() != 200) {
                 throw new RuntimeException("GET request failed. Status code: " + response.statusCode());
             }
@@ -37,7 +37,6 @@ public class APIUtils<T> {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         }
-
     }
 
     public T convertFromJson(String json, Class<T> tClass) {
