@@ -1,17 +1,17 @@
 package exceptions;
 
+import io.javalin.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 
 public class MissingIDException extends RuntimeException {
     private HttpStatus code;
-    private static final Logger logger = LoggerFactory.getLogger(ApiException.class);
+    private static final Logger logger = LoggerFactory.getLogger(MissingIDException.class);
 
     public MissingIDException(HttpStatus code, String msg){
         super(msg);
         this.code = code;
-        logger.error("ApiException (code={}): {}", code, msg);
+        logger.error("MissingIDException (code={}): {}", code, msg);
     }
     public HttpStatus getCode(){
         return code;

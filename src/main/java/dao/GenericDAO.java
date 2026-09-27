@@ -31,7 +31,7 @@ public class GenericDAO<T extends IEntity, ID> {
     public T create(T t) {
         //handles if T is missing
         if (t == null) {
-            throw new ApiException(HttpStatus.BAD_REQUEST.getCode(), entityClass.getSimpleName() + " is required");
+            throw new ApiException(HttpStatus.BAD_REQUEST, entityClass.getSimpleName() + " is required");
         }
         try (EntityManager entityManager = emf.createEntityManager();) {
             entityManager.getTransaction().begin();
@@ -43,7 +43,7 @@ public class GenericDAO<T extends IEntity, ID> {
                 if (entityManager.getTransaction().isActive()) {
                     entityManager.getTransaction().rollback();
                 }
-                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR.getCode(), "Create " + entityClass.getSimpleName()
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Create " + entityClass.getSimpleName()
                         + " failed with error message: " + e.getMessage());
             } catch (RuntimeException e) {
                 if (entityManager.getTransaction().isActive()) {
@@ -64,7 +64,7 @@ public class GenericDAO<T extends IEntity, ID> {
      */
     public T update(T t) {
         if (t == null) {
-            throw new ApiException(HttpStatus.BAD_REQUEST.getCode(),
+            throw new ApiException(HttpStatus.BAD_REQUEST,
                     entityClass.getSimpleName() + " id is required");
         }
         T merged = null;
@@ -73,7 +73,7 @@ public class GenericDAO<T extends IEntity, ID> {
             try {
                 T existing = entityManager.find(entityClass, t.getID());
                 if (existing == null) {
-                    throw new ApiException(HttpStatus.NOT_FOUND.getCode(),
+                    throw new ApiException(HttpStatus.NOT_FOUND,
                             entityClass.getSimpleName() + " ID could not be found");
                 }
                 merged = entityManager.merge(t);
@@ -82,7 +82,7 @@ public class GenericDAO<T extends IEntity, ID> {
                 if (entityManager.getTransaction().isActive()) {
                     entityManager.getTransaction().rollback();
                 }
-                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR.getCode(),
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR,
                         "Update " + entityClass.getSimpleName()
                                 + " failed with error message: " + e.getMessage());
             } catch (RuntimeException e) {
@@ -104,7 +104,7 @@ public class GenericDAO<T extends IEntity, ID> {
      */
     public T read(ID id) {
         if (id == null) {
-            throw new ApiException(HttpStatus.BAD_REQUEST.getCode(), entityClass.getSimpleName() + " id is required");
+            throw new ApiException(HttpStatus.BAD_REQUEST, entityClass.getSimpleName() + " id is required");
         }
         try (EntityManager entityManager = emf.createEntityManager()) {
             //Find entity
@@ -112,9 +112,9 @@ public class GenericDAO<T extends IEntity, ID> {
             if (t != null) {
                 return t;
             }
-            throw new ApiException(HttpStatus.NOT_FOUND.getCode(), entityClass.getSimpleName() + " could not be found");
+            throw new ApiException(HttpStatus.NOT_FOUND, entityClass.getSimpleName() + " could not be found");
         } catch (PersistenceException e) {
-            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR.getCode(), "Failed to fetch with error message: " + e.getMessage());
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to fetch with error message: " + e.getMessage());
         }
     }
 
@@ -129,7 +129,7 @@ public class GenericDAO<T extends IEntity, ID> {
     public boolean delete(ID id) {
         //ID check
         if (id == null) {
-            throw new ApiException(HttpStatus.BAD_REQUEST.getCode(), entityClass.getSimpleName() + " id is required.");
+            throw new ApiException(HttpStatus.BAD_REQUEST, entityClass.getSimpleName() + " id is required.");
         }
 
         Boolean isDeleted = false;
@@ -146,14 +146,14 @@ public class GenericDAO<T extends IEntity, ID> {
                     isDeleted = true;
                 } else {
                     //Handle if entity could not be found
-                    throw new ApiException(HttpStatus.NOT_FOUND.getCode(), entityClass.getSimpleName() + " could not be found");
+                    throw new ApiException(HttpStatus.NOT_FOUND, entityClass.getSimpleName() + " could not be found");
                 }
             } catch (PersistenceException e) {
                 //Roll back to prevent potential damage to database
                 if (entityManager.isOpen()) {
                     entityManager.getTransaction().rollback();
                 }
-                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR.getCode(), "Deletion of " + entityClass.getSimpleName() +
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Deletion of " + entityClass.getSimpleName() +
                         " has failed with error message: " + e.getMessage());
             }
         }
@@ -176,7 +176,7 @@ public class GenericDAO<T extends IEntity, ID> {
                 List<T> entities = query.getResultList();
                 return entities;
             } catch (PersistenceException e) {
-                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR.getCode(), "Get " + entityClass.getSimpleName()
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Get " + entityClass.getSimpleName()
                         + "has failed with error message" + e.getMessage());
             }
         }
