@@ -1,11 +1,13 @@
 package utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dto.*;
+import entities.Reference;
+import entities.Vulnerability;
+import exceptions.ApiException;
+import io.javalin.http.HttpStatus;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -24,12 +26,15 @@ public class APIUtils<T> {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(url))
                     .GET()
-                    .header("apiKey", apiKey)
+                   // .header("apiKey", apiKey)
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() != 200) {
+            if (response.statusCode() != HttpStatus.OK.getCode()) {
+                if(response.statusCode() == HttpStatus.TOO_MANY_REQUESTS.getCode()){
+                    throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "Rate limit have been exceeded");
+                }
                 throw new RuntimeException("GET request failed. Status code: " + response.statusCode());
             }
             return response.body();
@@ -39,21 +44,11 @@ public class APIUtils<T> {
         }
     }
 
-    public T convertFromJson(String json, Class<T> tClass) {
+    public NVDDTO convertFromJson(String json) {
         try {
-            return objectMapper.readValue(json, tClass);
+            return objectMapper.readValue(json, NVDDTO.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
-
-    public <T> T getWithJacksonGeneric(String url, Class<T> tClass) {
-        try {
-            JsonNode node = objectMapper.readTree(new URI(url).toURL());
-            return objectMapper.treeToValue(node, tClass);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }
