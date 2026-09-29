@@ -4,11 +4,11 @@ import io.javalin.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MissingIDException extends RuntimeException {
+public class MissingInputException extends RuntimeException {
     private HttpStatus code;
-    private static final Logger logger = LoggerFactory.getLogger(MissingIDException.class);
+    private static final Logger logger = LoggerFactory.getLogger(MissingInputException.class);
 
-    public MissingIDException(HttpStatus code, String msg){
+    public MissingInputException(HttpStatus code, String msg){
         super(msg);
         this.code = code;
         logger.error("MissingIDException (code={}): {}", code, msg);
