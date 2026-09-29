@@ -8,6 +8,7 @@ import dto.VulnerabilitiesDTO;
 import entities.Finding;
 import entities.Software;
 import entities.Vulnerability;
+import exceptions.MissingInputException;
 import mapper.VulnerabilityMapper;
 
 import java.time.LocalDateTime;
@@ -20,12 +21,30 @@ public class Service {
     private  SoftwareDAO softwareDAO;
     private  VulnerabilityDAO vulnerabilityDAO;
     private  FindingDAO findingDAO;
+    MissingInputException missingInputException;
 
     String apiKey = System.getenv("apiKey");
 
+
+    /**
+     * Checks a software against NVD api and creates a finding for every known vulnerability.
+     * The vulnerabilities and findings are saved in the database using DAO.
+     * @param softwareId the id of the software to check
+     * @return a list of the new findings, or an empty list if nothing was found
+     * @throws MissingInputException if vendor, name or version on the software is null or blank
+     * @throws exceptions.ApiException if the software does not exist (404) or NVD could not be reached or read (429, 502, 503)
+     */
     public List<Finding> findVulnerabilities(Long softwareId) {
+        missingInputException.requireValue(softwareId.toString(), "ID", "Software");
+
         //Hent softwaren fra databasen og brug readAPI
-       Software found = softwareDAO.read(softwareId);
+        Software found = softwareDAO.read(softwareId);
+
+        //Error handling hvis værdier er empty
+        missingInputException.requireValue(found.getVendor(), "vendor", "Software");
+        missingInputException.requireValue(found.getSoftwareName(), "name", "Software");
+        missingInputException.requireValue(found.getVersion(), "version", "Software");
+
        String json = apiUtils.readAPI(apiKey, found.getVendor(), found.getSoftwareName(), found.getVersion());
 
         //Parse JSON til NVDDTOen
