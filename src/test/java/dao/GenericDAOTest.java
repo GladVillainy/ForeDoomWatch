@@ -9,6 +9,7 @@ import exceptions.ApiException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
+import io.javalin.http.HttpStatus;
 
 import java.util.List;
 
@@ -136,7 +137,7 @@ class GenericDAOTest {
     @Test
     void update_withNullUser_throwsApiException() {
         ApiException ex = assertThrows(ApiException.class, () -> userDAO.update(null));
-        assertThat(ex.getCode(), is(400));
+        assertThat(ex.getCode(), is(HttpStatus.BAD_REQUEST));
     }
 
     @Test
@@ -190,7 +191,7 @@ class GenericDAOTest {
         });
 
         //Compare
-        assertThat(exception.getCode(), is(404));
+        assertThat(exception.getCode(), is(HttpStatus.NOT_FOUND));
         assertThat(isDeleted, is(true));
 
     }
