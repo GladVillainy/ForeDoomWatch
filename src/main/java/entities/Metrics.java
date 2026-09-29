@@ -4,7 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;
 
-@Embeddable
+@Embeddable @ToString
 @Builder @NoArgsConstructor @AllArgsConstructor
 @Getter @Setter
 public class Metrics {

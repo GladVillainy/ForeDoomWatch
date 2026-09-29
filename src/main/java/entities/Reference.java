@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.util.List;
 @Builder @NoArgsConstructor @AllArgsConstructor
-@Getter @Setter @Entity
+@Getter @Setter @Entity @ToString
 public class Reference {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id @Column(name = "refernce_Id")

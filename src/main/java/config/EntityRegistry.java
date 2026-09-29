@@ -16,5 +16,7 @@ final class EntityRegistry {
         configuration.addAnnotatedClass(Software.class);
         configuration.addAnnotatedClass(Vulnerability.class);
         configuration.addAnnotatedClass(Finding.class);
+        configuration.addAnnotatedClass(Metrics.class);
+        configuration.addAnnotatedClass(Reference.class);
     }
 }
