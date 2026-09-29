@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity @Getter @ToString @AllArgsConstructor
 @NoArgsConstructor @Setter @Builder
-public class Finding implements IEntity {
+public class Finding implements IEntity<Long> {
     @Id @Column(name = "finding_id") @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long findingID;
 

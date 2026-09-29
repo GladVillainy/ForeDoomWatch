@@ -1,9 +1,13 @@
 package entities;
 
 import jakarta.persistence.*;
+import lombok.*;
 
-@Entity
-public class Software implements IEntity {
+import java.util.List;
+
+@Entity @Setter @NoArgsConstructor
+@AllArgsConstructor @Builder @Getter
+public class Software implements IEntity<Long> {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "software_id")
     private long softwareId;
@@ -14,15 +18,14 @@ public class Software implements IEntity {
     @Column(name = "software_version")
     private String version;
 
+    private String vendor;
 
+    @OneToMany(mappedBy = "software")
+    private List<Finding> finding;
 
     @ManyToOne
-    @JoinColumn(name = "host_host_id")
+    @JoinColumn(name = "host_id")
     private Host host;
-    
-    public Host getHost() {return host;}
-
-    public void setHost(Host host) {this.host = host;}
 
     @Override
     public Long getID() {

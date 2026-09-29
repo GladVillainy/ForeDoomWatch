@@ -1,16 +1,12 @@
 package entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-@Entity
-@ToString
-@NoArgsConstructor
-@Getter @Table(name = "users")
-public class User implements IEntity {
+@Entity @AllArgsConstructor
+@NoArgsConstructor @Builder
+@Getter @Table(name = "users") @Setter
+public class User implements IEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,19 +20,6 @@ public class User implements IEntity {
     public User(String email, String username, String password) {
         this.email = email;
         this.username = username;
-        this.password = password;
-    }
-
-    //Setters
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
         this.password = password;
     }
 
