@@ -48,7 +48,7 @@ public class APIUtils<T> {
         try {
             return objectMapper.readValue(json, NVDDTO.class);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new ApiException(HttpStatus.BAD_GATEWAY, "Could not read response from external API");
         }
     }
 }
