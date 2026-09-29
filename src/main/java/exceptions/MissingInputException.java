@@ -16,4 +16,10 @@ public class MissingInputException extends RuntimeException {
     public HttpStatus getCode(){
         return code;
     }
+
+    public void requireValue(String value, String fieldName, String inputType) {
+        if (value == null || value.isBlank()) {
+            throw new MissingInputException(HttpStatus.BAD_REQUEST, "Software " + fieldName + " cannot be empty");
+        }
+    }
 }
