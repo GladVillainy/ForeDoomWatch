@@ -1,56 +1,36 @@
 package entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
-@Entity @Getter @ToString
-@NoArgsConstructor
+@Entity @Getter @ToString @AllArgsConstructor
+@NoArgsConstructor @Setter @Builder
 public class Finding implements IEntity {
-    @Id @Column(name = "finding_id")
+    @Id @Column(name = "finding_id") @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long findingID;
 
-
-    private FindingStatus status;
+    @Enumerated(EnumType.STRING) @Builder.Default
+    private FindingStatus status = FindingStatus.OPEN;
 
     @Column(name = "detected_at")
-    private Timestamp detectedAt;
+    private LocalDateTime detectedAt;
 
     @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "resolved_at")
-    private Timestamp resolvedAt;
+    private LocalDateTime resolvedAt;
 
-    public Finding(FindingStatus status, Timestamp detectedAt,
-                   Timestamp updatedAt, Timestamp resolvedAt) {
-        this.status = status;
-        this.detectedAt = detectedAt;
-        this.updatedAt = updatedAt;
-        this.resolvedAt = resolvedAt;
-    }
+    @ManyToOne
+    @JoinColumn(name = "software_id")
+    private Software software;
 
-    public void setStatus(FindingStatus status) {
-        this.status = status;
-    }
-
-    public void setDetectedAt(Timestamp detectedAt) {
-        this.detectedAt = detectedAt;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public void setResolvedAt(Timestamp resolvedAt) {
-        this.resolvedAt = resolvedAt;
-    }
-
+    @ManyToOne
+    @JoinColumn(name = "vulnerability_id")
+    private Vulnerability vulnerability;
 
     @Override
     public Long getID() {
