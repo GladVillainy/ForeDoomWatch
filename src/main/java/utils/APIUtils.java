@@ -16,17 +16,17 @@ public class APIUtils<T> {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public String readAPI(String apiKey, String search) {
+    public String readAPI(String apiKey, String vendor, String product, String version) {
+
         String url = "https://services.nvd.nist.gov/rest/json/cves/2.0"
-                + "?keywordSearch=" + search
-                + "&resultsPerPage=2";
+                + "?virtualMatchString=cpe:2.3:a:" + vendor + ":" + product + ":" + version;
         try {
             HttpClient client = HttpClient.newHttpClient();
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(url))
                     .GET()
-                   // .header("apiKey", apiKey)
+                    .header("apiKey", apiKey)
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
