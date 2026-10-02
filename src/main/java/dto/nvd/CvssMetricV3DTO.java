@@ -1,11 +1,10 @@
-package dto;
+package dto.nvd;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record ReferenceDTO(
-        String url,
+public record CvssMetricV3DTO(
         String source,
-        List<String> tags
+        String type,
+        CvssDataDTO cvssData
 ) { }

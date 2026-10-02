@@ -1,4 +1,4 @@
-package dto;
+package dto.nvd;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

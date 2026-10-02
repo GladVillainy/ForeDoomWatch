@@ -1,8 +1,9 @@
-package dto;
+package dto.nvd;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record VulnerabilitiesDTO(
-        CveDTO cve
+public record DescriptionDTO(
+        String lang,
+        String value
 ) { }
