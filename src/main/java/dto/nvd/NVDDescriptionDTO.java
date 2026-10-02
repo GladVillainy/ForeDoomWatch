@@ -3,8 +3,7 @@ package dto.nvd;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record CvssMetricV3DTO(
-        String source,
-        String type,
-        CvssDataDTO cvssData
+public record NVDDescriptionDTO(
+        String lang,
+        String value
 ) { }

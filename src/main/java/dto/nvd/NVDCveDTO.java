@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record CveDTO(
+public record NVDCveDTO(
         @JsonProperty("id")
         String cveId,
-        List<DescriptionDTO> descriptions,
-        List<ReferenceDTO> references,
-        MetricsDTO metrics
+        List<NVDDescriptionDTO> descriptions,
+        List<NVDReferenceDTO> references,
+        NVDMetricsDTO metrics
 ) { }

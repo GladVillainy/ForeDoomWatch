@@ -3,7 +3,8 @@ package dto.nvd;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record DescriptionDTO(
-        String lang,
-        String value
-) { }
+public record NVDCvssDataDTO(
+        Double baseScore,
+        String vectorString,
+        String baseSeverity
+) {}
