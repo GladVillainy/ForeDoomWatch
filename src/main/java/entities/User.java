@@ -2,6 +2,7 @@ package entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 @Entity @AllArgsConstructor
 @NoArgsConstructor @Builder
@@ -15,12 +16,14 @@ public class User implements IEntity<Long> {
 
     private String email;
     private String username;
-    private String password;
 
-    public User(String email, String username, String password) {
-        this.email = email;
+    @Setter(AccessLevel.NONE)
+    private String passwordHash;
+
+    public User(String username, String email, String plainPassword) {
         this.username = username;
-        this.password = password;
+        this.email = email;
+        this.passwordHash = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
     }
 
     @Override
