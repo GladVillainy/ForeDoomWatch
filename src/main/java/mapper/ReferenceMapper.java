@@ -18,6 +18,7 @@ public class ReferenceMapper implements IMapper<Reference,ReferencesDTO, Referen
                 entity.getSource(),
                 entity.getTags()
         );
+        return referencesDTO;
     }
 
     @Override
