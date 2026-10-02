@@ -4,7 +4,7 @@ import dao.FindingDAO;
 import dao.SoftwareDAO;
 import dao.VulnerabilityDAO;
 import dto.nvd.NVDDTO;
-import dto.nvd.VulnerabilitiesDTO;
+import dto.nvd.NVDVulnerabilitiesDTO;
 import entities.Finding;
 import entities.Software;
 import entities.Vulnerability;
@@ -53,8 +53,8 @@ public class Service {
         //Map til en Vulnerability
         List<Vulnerability> vulnerabilities = nvddto.vulnerabilities()
                 .stream()
-                .map(VulnerabilitiesDTO::cve)
-                .map(mapper::mapToVulnerability)
+                .map(NVDVulnerabilitiesDTO::cve)
+                .map(mapper::vulnerabilityToEntity)
                 .toList();
 
         //Gem det findings i en liste
@@ -64,7 +64,7 @@ public class Service {
         for (Vulnerability v : vulnerabilities) {
             vulnerabilityDAO.create(v);
 
-            // For hver Vulnerability: lav et Finding, der peger på softwaren og vulnerabilityen og gem
+            // For hver Vulnerability lav et Finding, der peger på softwaren og vulnerabilityen og gem
            Finding finding = Finding.builder()
                     .detectedAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())

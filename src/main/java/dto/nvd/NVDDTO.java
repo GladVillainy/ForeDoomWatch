@@ -6,5 +6,5 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record NVDDTO(
-        List<VulnerabilitiesDTO> vulnerabilities
+        List<NVDVulnerabilitiesDTO> vulnerabilities
 ) { }
