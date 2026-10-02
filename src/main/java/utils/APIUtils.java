@@ -1,9 +1,7 @@
 package utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dto.*;
-import entities.Reference;
-import entities.Vulnerability;
+import dto.nvd.NVDDTO;
 import exceptions.ApiException;
 import io.javalin.http.HttpStatus;
 

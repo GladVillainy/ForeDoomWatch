@@ -1,12 +1,10 @@
 package entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Entity
-@Getter
-@NoArgsConstructor
+@Entity @Setter @NoArgsConstructor
+@AllArgsConstructor @Builder @Getter
 public class Host implements IEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "host_id")

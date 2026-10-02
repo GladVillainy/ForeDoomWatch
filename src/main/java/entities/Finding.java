@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor @Setter @Builder
 public class Finding implements IEntity<Long> {
     @Id @Column(name = "finding_id") @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long findingID;
+    private Long findingId;
 
     @Enumerated(EnumType.STRING) @Builder.Default
     private FindingStatus status = FindingStatus.OPEN;
@@ -34,6 +34,6 @@ public class Finding implements IEntity<Long> {
 
     @Override
     public Long getID() {
-        return findingID;
+        return findingId;
     }
 }
