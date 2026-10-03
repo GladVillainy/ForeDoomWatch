@@ -26,6 +26,11 @@ public class User implements IEntity<Long> {
         this.passwordHash = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
     }
 
+    public void changePassword(String newpswd){
+        this.passwordHash = BCrypt.hashpw(newpswd, BCrypt.gensalt());
+
+    }
+
     @Override
     public Long getID() {
         return userId;

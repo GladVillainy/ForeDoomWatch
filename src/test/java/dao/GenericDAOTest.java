@@ -1,6 +1,5 @@
 package dao;
 
-
 import com.fasterxml.jackson.annotation.JacksonInject;
 import config.HibernateTestConfig;
 import entities.Host;
@@ -39,8 +38,11 @@ class GenericDAOTest {
     void setUp() {
         EntityManager em = emf.createEntityManager();
 
-        //Clean users
+        //Clean tables
         em.getTransaction().begin();
+        em.createQuery("DELETE FROM Finding").executeUpdate();
+        em.createQuery("DELETE FROM Software").executeUpdate();
+        em.createQuery("DELETE FROM Host").executeUpdate();
         em.createQuery("DELETE FROM User").executeUpdate();
         em.getTransaction().commit();
         em.close();
@@ -55,7 +57,7 @@ class GenericDAOTest {
     @Test
     void create() {
         //Testing user 1
-        User user1 = new User("Lucas@mail.com", "Lucas", "Ek12");
+        User user1 = new User("Lucas", "Lucas@mail.com", "Ek12");
 
         userDAO.create(user1);
         user1.getUserId();
@@ -64,7 +66,7 @@ class GenericDAOTest {
         assertThat(fetchedUser1.getUserId(), is(user1.getUserId()));
 
         //Testing user2
-        User user2 = new User("Thomas@mail.com", "Thomas", "Ek13");
+        User user2 = new User("Thomas", "Thomas@mail.com", "Ek13");
 
         userDAO.create(user2);
         user2.getUserId();
@@ -107,7 +109,7 @@ class GenericDAOTest {
     @Test
     void update() {
         //Make user 1
-        User user1 = new User("Lucas@mail.com", "Lucas", "Ek12");
+        User user1 = new User("Lucas", "Lucas@mail.com", "Ek12");
 
         //Test user 1
         userDAO.create(user1);
@@ -116,10 +118,11 @@ class GenericDAOTest {
         User fetchedUser1 = userDAO.read(user1.getUserId());
         assertThat(fetchedUser1.getUserId(), is(user1.getUserId()));
 
+        //Update user 1 (password has no setter, so only email and username are updated)
         //Update user 1
         fetchedUser1.setEmail("LucasUpdated@mail");
         fetchedUser1.setUsername("LucasUpdated");
-        fetchedUser1.setPassword("ek12Updated");
+        fetchedUser1.changePassword("ek12Updated");
         userDAO.update(fetchedUser1);
         assertThat(fetchedUser1.getUserId(), notNullValue());
 
@@ -143,7 +146,7 @@ class GenericDAOTest {
     @Test
     void read() {
         //make user 1
-        User user1 = new User("Lucas@mail.com", "Lucas", "Ek12");
+        User user1 = new User("Lucas", "Lucas@mail.com", "Ek12");
         userDAO.create(user1);
         user1.getUserId();
         assertThat(user1.getUserId(), notNullValue());
@@ -153,7 +156,7 @@ class GenericDAOTest {
         assertThat(fetchedUser1.getUserId(), is(user1.getUserId()));
 
         //Make user2
-        User user2 = new User("Thomas@mail.com", "Thomas", "Ek13");
+        User user2 = new User("Thomas", "Thomas@mail.com", "Ek13");
 
         userDAO.create(user2);
         user2.getUserId();
@@ -173,7 +176,7 @@ class GenericDAOTest {
     @Test
     void delete() {
         //make user 1
-        User user1 = new User("Lucas@mail.com", "Lucas", "Ek12");
+        User user1 = new User("Lucas", "Lucas@mail.com", "Ek12");
         userDAO.create(user1);
         user1.getUserId();
         assertThat(user1.getUserId(), notNullValue());
@@ -199,9 +202,9 @@ class GenericDAOTest {
     @Test
     void readAll() {
         //Create 3 users
-        User user1 = new User("Lucas@mail.com", "Lucas", "Ek12");
-        User user2 = new User("Thomas@mail.com", "ThomasH", "Ek13");
-        User user3 = new User("Jon@mail.com", "Jon", "Ek13");
+        User user1 = new User("Lucas", "Lucas@mail.com", "Ek12");
+        User user2 = new User("ThomasH", "Thomas@mail.com", "Ek13");
+        User user3 = new User("Jon", "Jon@mail.com", "Ek13");
 
         userDAO.create(user1);
         userDAO.create(user2);
