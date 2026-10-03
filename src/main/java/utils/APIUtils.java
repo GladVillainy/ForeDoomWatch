@@ -10,7 +10,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class APIUtils<T> {
+public class APIUtils {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

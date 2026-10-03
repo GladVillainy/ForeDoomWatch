@@ -10,7 +10,6 @@ import entities.Software;
 import entities.Vulnerability;
 import exceptions.MissingInputException;
 import mapper.NVDMapper;
-import mapper.VulnerabilityMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ public class Service {
     private  SoftwareDAO softwareDAO;
     private  VulnerabilityDAO vulnerabilityDAO;
     private  FindingDAO findingDAO;
-    MissingInputException missingInputException;
 
     String apiKey = System.getenv("apiKey");
 
@@ -36,15 +34,15 @@ public class Service {
      * @throws exceptions.ApiException if the software does not exist (404) or NVD could not be reached or read (429, 502, 503)
      */
     public List<Finding> findVulnerabilities(Long softwareId) {
-        missingInputException.requireValue(softwareId.toString(), "ID", "Software");
+        MissingInputException.requireValue(softwareId, "ID", "Software");
 
         //Hent softwaren fra databasen og brug readAPI
         Software found = softwareDAO.read(softwareId);
 
         //Error handling hvis værdier er empty
-        missingInputException.requireValue(found.getVendor(), "vendor", "Software");
-        missingInputException.requireValue(found.getSoftwareName(), "name", "Software");
-        missingInputException.requireValue(found.getVersion(), "version", "Software");
+        MissingInputException.requireValue(found.getVendor(), "vendor", "Software");
+        MissingInputException.requireValue(found.getSoftwareName(), "name", "Software");
+        MissingInputException.requireValue(found.getVersion(), "version", "Software");
 
        String json = apiUtils.readAPI(apiKey, found.getVendor(), found.getSoftwareName(), found.getVersion());
 
