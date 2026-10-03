@@ -15,7 +15,8 @@ import java.util.List;
 
 /**
  * Data access object(DAO) for the entities of type {@link Finding}
- * FindingDAO extends {@link GenericDAO}, therefor inherits the same CRUD (Create, Read, Update, Delete) methods from {@link GenericDAO}
+ * FindingDAO extends {@link GenericDAO}, therefor inherits the same CRUD (Create, Read, Update, Delete)
+ * methods from sup{@link GenericDAO}
  * The DAO contains 2 custom methods: {@link sortByStatusAscending} and {@link sortByStatusDescending}
  */
 public class FindingDAO extends GenericDAO<Finding,Long> {
