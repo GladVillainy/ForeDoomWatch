@@ -6,13 +6,12 @@ public enum FindingStatus {
     IN_PROGRESS(2),
     RESOVLED(3);
 
-    private final int status;
+    private final int order;
 
-    FindingStatus(int status) {
-        this.status = status;
+    FindingStatus(int order) {
+        this.order = order;
     }
-
-    public int getStatus() {
-        return status;
+    public int getOrder() {
+        return order;
     }
 }
