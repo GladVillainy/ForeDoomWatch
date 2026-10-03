@@ -9,6 +9,7 @@ import entities.Finding;
 import entities.Software;
 import entities.Vulnerability;
 import exceptions.MissingInputException;
+import mapper.NVDMapper;
 import mapper.VulnerabilityMapper;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ import java.util.List;
 
 public class Service {
     private APIUtils apiUtils;
-    private VulnerabilityMapper mapper;
+    private NVDMapper mapper;
     private  SoftwareDAO softwareDAO;
     private  VulnerabilityDAO vulnerabilityDAO;
     private  FindingDAO findingDAO;
