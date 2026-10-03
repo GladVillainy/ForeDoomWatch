@@ -1,10 +1,7 @@
 package mapper;
 
 import dto.ReferencesDTO;
-import dto.nvd.ReferenceDTO;
 import entities.Reference;
-
-import javax.swing.text.html.parser.Entity;
 import java.util.List;
 
 public class ReferenceMapper implements IMapper<Reference,ReferencesDTO, ReferencesDTO> {
