@@ -12,7 +12,7 @@ public class GenericDAO<T extends IEntity, ID> {
     //Status code overview link:
     // https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/http/HttpStatus.html
 
-    private final EntityManagerFactory emf;
+    protected final EntityManagerFactory emf;
     private Class<T> entityClass;
 
     public GenericDAO(EntityManagerFactory emf, Class<T> entityClass) {

@@ -20,12 +20,11 @@ import java.util.List;
  * The DAO contains 2 custom methods: {@link sortByStatusAscending} and {@link sortByStatusDescending}
  */
 public class FindingDAO extends GenericDAO<Finding,Long> {
-    public FindingDAO(EntityManagerFactory emf, Class<Finding> entityClass) {
-        super(emf, entityClass);
+    public FindingDAO(EntityManagerFactory emf) {
+        super(emf, Finding.class);
     }
 
-    EntityManagerFactory emf;
-
+    
     /**
      * Retrieves all findings that belongings to the given user, sorted by finding status based on enums field order (int)
      *  * {@link FindingStatus} (OPEN = 1, IN_PROGRESS = 2, RESOLVED = 3).
