@@ -9,7 +9,7 @@ public record FindingDTO(
         FindingStatus status,
         LocalDateTime detectedAt,
         LocalDateTime updatedAt,
-        LocalDateTime resovledAt
+        LocalDateTime resolvedAt
 
 ) {
 }

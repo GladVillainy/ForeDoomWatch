@@ -24,7 +24,7 @@ public class FindingDAO extends GenericDAO<Finding,Long> {
         super(emf, Finding.class);
     }
 
-    
+
     /**
      * Retrieves all findings that belongings to the given user, sorted by finding status based on enums field order (int)
      *  * {@link FindingStatus} (OPEN = 1, IN_PROGRESS = 2, RESOLVED = 3).
