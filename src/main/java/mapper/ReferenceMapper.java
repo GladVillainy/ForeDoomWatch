@@ -10,7 +10,7 @@ public class ReferenceMapper implements IMapper<Reference,ReferencesDTO, Referen
     @Override
     public ReferencesDTO toDTO(Reference entity) {
         ReferencesDTO referencesDTO = new ReferencesDTO(
-                entity.getRefernceId(),
+                entity.getReferenceId(),
                 entity.getUrl(),
                 entity.getSource(),
                 entity.getTags()
@@ -21,7 +21,6 @@ public class ReferenceMapper implements IMapper<Reference,ReferencesDTO, Referen
     @Override
     public Reference toEntity(ReferencesDTO dto) {
         return Reference.builder()
-                .refernceId(dto.refernceId())
                 .url(dto.url())
                 .source(dto.source())
                 .tags(dto.tags())

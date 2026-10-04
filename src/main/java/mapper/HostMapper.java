@@ -21,7 +21,6 @@ public class HostMapper implements IMapper<Host, HostDTO, HostDTO> {
     @Override
     public Host toEntity(HostDTO dto) {
         return Host.builder()
-                .hostId(dto.id())
                 .hostName(dto.hostname())
                 .hostDescription(dto.hostDescription())
                 .build();

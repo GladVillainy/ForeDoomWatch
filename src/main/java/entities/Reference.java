@@ -8,8 +8,8 @@ import java.util.List;
 @Getter @Setter @Entity @ToString
 public class Reference {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id @Column(name = "refernce_Id")
-    private Long refernceId;
+    @Id @Column(name = "reference_Id")
+    private Long referenceId;
 
     private String url;
     private String source;
