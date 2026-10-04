@@ -22,9 +22,17 @@ public class Service {
     private SoftwareDAO softwareDAO;
     private VulnerabilityDAO vulnerabilityDAO;
     private FindingDAO findingDAO;
+    private String apiKey;
 
-    String apiKey = System.getenv("apiKey");
-
+    public Service(APIUtils apiUtils, NVDMapper mapper, SoftwareDAO softwareDAO,
+                   VulnerabilityDAO vulnerabilityDAO, FindingDAO findingDAO, String apiKey) {
+        this.apiUtils = apiUtils;
+        this.mapper = mapper;
+        this.softwareDAO = softwareDAO;
+        this.vulnerabilityDAO = vulnerabilityDAO;
+        this.findingDAO = findingDAO;
+        this.apiKey = apiKey;
+    }
 
     /**
      * Checks a software against NVD api and creates a finding for every known vulnerability.
