@@ -6,7 +6,7 @@ import entities.User;
 
 import java.util.List;
 
-public abstract class UserMapper implements IMapper<User, UserDTO, AuthDTO> {
+public class UserMapper implements IMapper<User, UserDTO, AuthDTO> {
 
     @Override
     public UserDTO toDTO(User entity) {

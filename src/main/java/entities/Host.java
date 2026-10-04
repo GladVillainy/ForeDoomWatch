@@ -8,7 +8,7 @@ import lombok.*;
 public class Host implements IEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "host_id")
-    private long hostId;
+    private Long hostId;
 
     @Column(name = "host_name")
     private String hostName;
