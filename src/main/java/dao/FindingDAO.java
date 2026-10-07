@@ -2,6 +2,7 @@ package dao;
 
 import entities.Finding;
 import entities.FindingStatus;
+import entities.Metrics;
 import exceptions.DatabaseException;
 import exceptions.MissingInputException;
 import io.javalin.http.HttpStatus;
