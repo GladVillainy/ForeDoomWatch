@@ -73,4 +73,38 @@ public class FindingDAO extends GenericDAO<Finding,Long> {
         return sortByStatusAscending(userId).reversed();
     }
 
+    public List<Finding> sortCvssAscending(Long userId){
+        MissingInputException.requireValue(userId, "id", "User");
+
+        try(EntityManager entityManager = emf.createEntityManager()){
+            //sorterer efter jpql status
+            String JPQL = "SELECT f FROM Finding f" +
+                    " WHERE f.software.host.user.userId = :userId";
+            try {
+                // Opret en TypedQuery<Finding>
+                TypedQuery<Finding> query = entityManager.createQuery(JPQL, Finding.class);
+                //Set userid som param
+                query.setParameter("userId", userId);
+
+                List<Finding> findings = query.getResultList();
+
+                //Sorts
+                return findings.stream()
+                        .sorted(Comparator.comparing(f -> f.getVulnerability().getMetrics().getCvssScore()))
+                        .toList();
+
+            } catch (PersistenceException e) {
+                // Fang PersistenceException og kast med 500
+                throw new DatabaseException(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Getting Cvss has failed with error message " + e.getMessage());
+            }
+        }
+
+    }
+
+    public List<Finding> sortCvssDescending(Long userId){
+        return sortCvssAscending(userId).reversed();
+    }
+
+
 }
