@@ -23,6 +23,7 @@ public class GenericDAO<T extends IEntity, ID> {
 
     /**
      * Creates and persists a new entity of type T in the database.
+     *
      * @param t the entity to persist
      * @return the persisted entity of type T
      * @throws ApiException if t is null (HTTP status code 400)
@@ -48,7 +49,8 @@ public class GenericDAO<T extends IEntity, ID> {
             } catch (RuntimeException e) {
                 if (entityManager.getTransaction().isActive()) {
                     entityManager.getTransaction().rollback();
-                } throw e;
+                }
+                throw e;
             }
         }
         return t;
@@ -56,6 +58,7 @@ public class GenericDAO<T extends IEntity, ID> {
 
     /**
      * Updates an existing entity of type T, matched by its ID.
+     *
      * @param t the entity containing the updated values, its ID is used to find the existing entity
      * @return the updated (merged) entity of type T
      * @throws ApiException if t is null (HTTP status code 400)
@@ -88,7 +91,8 @@ public class GenericDAO<T extends IEntity, ID> {
             } catch (RuntimeException e) {
                 if (entityManager.getTransaction().isActive()) {
                     entityManager.getTransaction().rollback();
-                } throw e;
+                }
+                throw e;
             }
         }
         return merged;
@@ -96,6 +100,7 @@ public class GenericDAO<T extends IEntity, ID> {
 
     /**
      * Finds an entity of type T in the database using the given ID.
+     *
      * @param id the ID of the entity to find
      * @return the entity of type T if found
      * @throws ApiException if id is null (HTTP status code 400)
@@ -120,6 +125,7 @@ public class GenericDAO<T extends IEntity, ID> {
 
     /**
      * Deletes Type T from database using param ID
+     *
      * @param id the ID of the entity
      * @return true if deletion was successful, else false
      * @throws ApiException if id is null (Https status code 400)
@@ -162,6 +168,7 @@ public class GenericDAO<T extends IEntity, ID> {
 
     /**
      * Retries all entities from type T from the database
+     *
      * @return a list of all entities of type T, empty list if none exist.
      * @throws ApiException if the database query fails (status code 500)
      */

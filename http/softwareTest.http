@@ -1,0 +1,8 @@
+### Software på host (200)
+GET http://localhost:7070/api/hosts/1/software
+
+### Al software
+GET http://localhost:7070/api/software
+
+### Host der ikke findes (404)
+GET http://localhost:7070/api/hosts/999999/softwareost:7070/api/hosts/999999/software

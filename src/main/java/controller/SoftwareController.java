@@ -92,11 +92,11 @@ public class SoftwareController implements IController {
 
         softwareDAO.delete(id);
         ctx.status(HttpStatus.OK);
-        ctx.json(Map.of( "message", "Software was deleted",
+        ctx.json(Map.of("message", "Software was deleted",
                 "id", id));
     }
 
-    public void scan(Context ctx){
+    public void scan(Context ctx) {
         // Hent id fra url og kald find findVulnerabilities
         long id = getLongId(ctx);
         List<Finding> findings = service.findVulnerabilities(id);
@@ -107,5 +107,19 @@ public class SoftwareController implements IController {
         // return json
         ctx.status(HttpStatus.OK);
         ctx.json(findingDetailDTOList);
+    }
+
+    public void getByHost(Context ctx) {
+        // Hent hostId fra url
+        long hostId = ctx.pathParamAsClass("hostId", Long.class).get();
+
+        // Tjek ellers kaster read en 404
+        hostDAO.read(hostId);
+
+        List<Software> softwares = softwareDAO.readByHost(hostId);
+        List<SoftwareDTO> softwareDTOList = softwareMapper.toDTOList(softwares);
+
+        ctx.status(HttpStatus.OK);
+        ctx.json(softwareDTOList);
     }
 }

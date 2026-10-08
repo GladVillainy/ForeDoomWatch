@@ -20,7 +20,7 @@ public class Software implements IEntity<Long> {
 
     private String vendor;
 
-    @OneToMany(mappedBy = "software")
+    @OneToMany(mappedBy = "software", cascade = CascadeType.ALL)
     private List<Finding> finding;
 
     @ManyToOne
