@@ -2,7 +2,7 @@ package mapper;
 
 import dto.AuthDTO;
 import dto.UserDTO;
-import entities.User;
+import security.entities.User;
 
 import java.util.List;
 

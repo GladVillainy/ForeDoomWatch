@@ -1,5 +1,6 @@
-package entities;
+package security.entities;
 
+import entities.IEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.mindrot.jbcrypt.BCrypt;

@@ -2,6 +2,7 @@ package entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import security.entities.User;
 
 @Entity @Setter @NoArgsConstructor
 @AllArgsConstructor @Builder @Getter

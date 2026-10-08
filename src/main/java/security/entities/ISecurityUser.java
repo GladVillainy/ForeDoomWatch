@@ -1,4 +1,4 @@
-package entities;
+package security.entities;
 
 import java.util.Set;
 

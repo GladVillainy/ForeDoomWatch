@@ -1,4 +1,4 @@
-package entities;
+package security.entities;
 
 public enum Roles {
     ANYONE(1),

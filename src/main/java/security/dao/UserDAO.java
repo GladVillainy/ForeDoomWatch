@@ -1,7 +1,8 @@
-package dao;
+package security.dao;
 
-import entities.Roles;
-import entities.User;
+import dao.GenericDAO;
+import security.entities.Roles;
+import security.entities.User;
 import exceptions.ApiException;
 import exceptions.DatabaseException;
 import exceptions.MissingInputException;

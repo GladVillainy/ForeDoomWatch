@@ -2,6 +2,7 @@ package config;
 
 import entities.*;
 import org.hibernate.cfg.Configuration;
+import security.entities.User;
 
 final class EntityRegistry {
 

@@ -1,7 +1,7 @@
-package dao;
+package security.dao;
 
-import entities.Roles;
-import entities.User;
+import security.entities.Roles;
+import security.entities.User;
 
 public interface ISecurityDAO {
     User findByUsername(String username);
