@@ -1,9 +1,6 @@
 package config;
 
-import exceptions.ApiException;
-import exceptions.DatabaseException;
-import exceptions.EntityNotFoundException;
-import exceptions.MissingInputException;
+import exceptions.*;
 import io.javalin.Javalin;
 import io.javalin.config.JavalinConfig;
 import io.javalin.http.Context;
@@ -42,7 +39,7 @@ public class ApplicationConfig {
         app.exception(ApiException.class, (e, ctx) -> handleError(e.getCode(), e.getMessage(), ctx));
         app.exception(DatabaseException.class, (e, ctx) -> handleError(e.getCode(), e.getMessage(), ctx));
         app.exception(MissingInputException.class, (e, ctx) -> handleError(e.getCode(), e.getMessage(), ctx));
-        app.exception(EntityNotFoundException.class, (e, ctx) -> handleError(e.getCode(), e.getMessage(), ctx));
+        app.exception(EntityException.class, (e, ctx) -> handleError(e.getCode(), e.getMessage(), ctx));
 
         app.exception(Exception.class, this::generalExceptionHandler);
 
