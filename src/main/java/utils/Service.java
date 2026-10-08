@@ -37,7 +37,6 @@ public class Service {
     /**
      * Checks a software against NVD api and creates a finding for every known vulnerability.
      * The vulnerabilities and findings are saved in the database using DAO.
-     *
      * @param softwareId the id of the software to check
      * @return a list of the new findings, or an empty list if nothing was found
      * @throws MissingInputException   if vendor, name or version on the software is null or blank

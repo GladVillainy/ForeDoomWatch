@@ -3,6 +3,7 @@ package controller;
 import dao.HostDAO;
 import dao.SoftwareDAO;
 import dto.FindingDTO;
+import dto.FindingDetailDTO;
 import dto.SoftwareDTO;
 import entities.Finding;
 import entities.Host;
@@ -100,11 +101,11 @@ public class SoftwareController implements IController {
         long id = getLongId(ctx);
         List<Finding> findings = service.findVulnerabilities(id);
 
-        // Lav listen af Finding om til en liste af FindingDTO
-        List<FindingDTO> findingDTOList = findingMapper.toDTOList(findings);
+        // Lav listen af Finding om til en liste af FindingDetailDTO
+        List<FindingDetailDTO> findingDetailDTOList = findingMapper.toDetailDTOList(findings);
 
         // return json
         ctx.status(HttpStatus.OK);
-        ctx.json(findingDTOList);
+        ctx.json(findingDetailDTOList);
     }
 }

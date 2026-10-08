@@ -1,6 +1,7 @@
 package controller;
 
 import dao.FindingDAO;
+import dto.FindingDetailDTO;
 import dto.FindingDTO;
 import entities.Finding;
 import io.javalin.http.Context;
@@ -22,7 +23,7 @@ public class FindingController {
         long id = getLongId(ctx);
 
         List<Finding> findingList = findingDAO.sortByStatusAscending(id);
-        List<FindingDTO> findingDTOS = findingMapper.toDTOList(findingList);
+        List<FindingDetailDTO> findingDTOS = findingMapper.toDetailDTOList(findingList);
 
         ctx.status(HttpStatus.OK);
         ctx.json(findingDTOS);
@@ -33,7 +34,7 @@ public class FindingController {
         long id = getLongId(ctx);
 
         List<Finding> findingList = findingDAO.sortByStatusDescending(id);
-        List<FindingDTO> findingDTOS = findingMapper.toDTOList(findingList);
+        List<FindingDetailDTO> findingDTOS = findingMapper.toDetailDTOList(findingList);
 
         ctx.status(HttpStatus.OK);
         ctx.json(findingDTOS);
@@ -59,7 +60,7 @@ public class FindingController {
         long id = getLongId(ctx);
 
         List<Finding> findingList = findingDAO.sortCvssAscending(id);
-        List<FindingDTO> findingDTOS = findingMapper.toDTOList(findingList);
+        List<FindingDetailDTO> findingDTOS = findingMapper.toDetailDTOList(findingList);
 
         ctx.status(HttpStatus.OK);
         ctx.json(findingDTOS);
@@ -69,7 +70,7 @@ public class FindingController {
         long id = getLongId(ctx);
 
         List<Finding> findingList = findingDAO.sortCvssDescending(id);
-        List<FindingDTO> findingDTOS = findingMapper.toDTOList(findingList);
+        List<FindingDetailDTO> findingDTOS = findingMapper.toDetailDTOList(findingList);
 
         ctx.status(HttpStatus.OK);
         ctx.json(findingDTOS);
