@@ -2,9 +2,8 @@ package dao;
 
 import entities.Finding;
 import entities.FindingStatus;
-import entities.Metrics;
 import exceptions.DatabaseException;
-import exceptions.MissingInputException;
+import exceptions.ValidationException;
 import io.javalin.http.HttpStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -32,10 +31,10 @@ public class FindingDAO extends GenericDAO<Finding,Long> {
      * @param userId the id of the user who owns the findings
      * @return a list of the users findings sorted by status, empty if none exist
      * @throws DatabaseException if the database query fails (status code 500)
-     * @throws MissingInputException if user id is null (400)
+     * @throws ValidationException if user id is null (400)
      */
     public List<Finding> sortByStatusAscending(Long userId) {
-        MissingInputException.requireValue(userId, "id", "User");
+        ValidationException.requireValue(userId, "id", "User");
         // Åbn en EntityManager med try-with-resources
         try(EntityManager entityManager = emf.createEntityManager()){
             //sorterer efter jpql status
@@ -67,7 +66,7 @@ public class FindingDAO extends GenericDAO<Finding,Long> {
      * of the order field in {@link FindingStatus} (RESOLVED = 3, IN_PROGRESS = 2, OPEN = 1).
      * @param userId the id of the user who owns the findings
      * @return a list of the user's findings sorted by status in descending order, empty if none exist
-     * @throws MissingInputException if userId is null (status code 400)
+     * @throws ValidationException if userId is null (status code 400)
      * @throws DatabaseException if the database query fails (status code 500)
      */
     public List<Finding> sortByStatusDescending(Long userId){
@@ -75,7 +74,7 @@ public class FindingDAO extends GenericDAO<Finding,Long> {
     }
 
     public List<Finding> sortCvssAscending(Long userId){
-        MissingInputException.requireValue(userId, "id", "User");
+        ValidationException.requireValue(userId, "id", "User");
 
         try(EntityManager entityManager = emf.createEntityManager()){
             //sorterer efter jpql status

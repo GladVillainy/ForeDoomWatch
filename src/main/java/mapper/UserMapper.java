@@ -1,6 +1,6 @@
 package mapper;
 
-import dto.AuthDTO;
+import security.dto.AuthDTO;
 import dto.UserDTO;
 import security.entities.User;
 
