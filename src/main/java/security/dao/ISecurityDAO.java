@@ -4,8 +4,8 @@ import security.entities.Roles;
 import security.entities.User;
 
 public interface ISecurityDAO {
-    User findByUsername(String username);
-    User getVerifiedUser(String username, String password);
+    User findByEmail(String email);
+    User getVerifiedUser(String email, String password);
     User createUser(String username, String email, String password);
-    User addUserRole(String username, Roles role);
+    User addUserRole(String email, Roles role);
 }

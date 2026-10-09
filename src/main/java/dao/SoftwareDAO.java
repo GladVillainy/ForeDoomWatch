@@ -2,7 +2,7 @@ package dao;
 
 import entities.Software;
 import exceptions.DatabaseException;
-import exceptions.MissingInputException;
+import exceptions.ValidationException;
 import io.javalin.http.HttpStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -29,12 +29,12 @@ public class SoftwareDAO extends GenericDAO<Software, Long> {
      *
      * @param hostId the id of the host that contains the software
      * @return a list of the host's software, empty if none exist
-     * @throws MissingInputException if hostId is null (400)
+     * @throws ValidationException if hostId is null (400)
      * @throws DatabaseException     if the database query fails (status code 500)
      */
     public List<Software> readByHost(Long hostId) {
         // Tjek at hostId ikke er null
-        MissingInputException.requireValue(hostId, "id", "Host");
+        ValidationException.requireValue(hostId, "id", "Host");
         // EntityManager med try-with-resources
         try (EntityManager entityManager = emf.createEntityManager()) {
             // Hent software hvor hosten har det givne id

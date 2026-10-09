@@ -31,12 +31,12 @@ public class ApiException extends RuntimeException {
     /**
      * Checks that the given key is neither null nor blank.
      * @param apiKey the key to check
-     * @throws MissingInputException if the key is null or blank (status code 500)
+     * @throws ValidationException if the key is null or blank (status code 500)
      */
 
     public static void requireApiKey(String apiKey) {
         if (apiKey == null || apiKey.isBlank()) {
-            throw new MissingInputException(HttpStatus.INTERNAL_SERVER_ERROR, "Api key is missing");
+            throw new ValidationException(HttpStatus.INTERNAL_SERVER_ERROR, "Api key is missing");
         }
     }
 

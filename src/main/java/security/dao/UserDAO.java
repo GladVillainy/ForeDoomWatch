@@ -5,7 +5,7 @@ import security.entities.Roles;
 import security.entities.User;
 import exceptions.ApiException;
 import exceptions.DatabaseException;
-import exceptions.MissingInputException;
+import exceptions.ValidationException;
 import io.javalin.http.HttpStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -26,24 +26,24 @@ public class UserDAO extends GenericDAO<User, Long> implements ISecurityDAO {
     }
 
     /**
-     * Finds a user by username.
-     * @param username the username to search for
-     * @return the user, or null if no user has that username
-     * @throws MissingInputException if username is null or blank (status code 400)
+     * Finds a user by email.
+     * @param email the email to search for
+     * @return the user, or null if no user has that email
+     * @throws ValidationException if email is null or blank (status code 400)
      * @throws DatabaseException if the database query fails (status code 500)
      */
     @Override
-    public User findByUsername(String username) {
-        MissingInputException.requireValue(username, "username", "User");
+    public User findByEmail(String email) {
+        ValidationException.requireValue(email, "email", "User");
         try (EntityManager entityManager = emf.createEntityManager()) {
 
-            String JPQL = "SELECT u FROM User u WHERE u.username = :username";
+            String JPQL = "SELECT u FROM User u WHERE u.email = :email";
 
             try {
                 // Opret en TypedQuery<User>
                 TypedQuery<User> query = entityManager.createQuery(JPQL, User.class);
-                //Set username som param
-                query.setParameter("username", username);
+                //Set email som param
+                query.setParameter("email", email);
 
                 List<User> userList = query.getResultList();
 
@@ -60,24 +60,23 @@ public class UserDAO extends GenericDAO<User, Long> implements ISecurityDAO {
     }
 
     @Override
-    public User getVerifiedUser(String username, String password) {
-        User user = findByUsername(username);
+    public User getVerifiedUser(String email, String password) {
+        User user = findByEmail(email);
 
         if (user == null || !user.verifyPassword(password)) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "Wrong username or password");
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Wrong email or password");
         }
         return user;
     }
 
     @Override
     public User createUser(String username, String email, String password) {
-        MissingInputException.requireValue(username, "username", "User");
-        MissingInputException.requireValue(email, "email", "User");
-        MissingInputException.requireValue(password, "password", "User");
+        ValidationException.validateEmail(email);
+        ValidationException.requireValue(password, "password", "User");
 
-        //Brugernavnet skal være unikt
-        if (findByUsername(username) != null) {
-            throw new ApiException(HttpStatus.CONFLICT, "Username has to be unique");
+        //Emailen skal være unik
+        if (findByEmail(email) != null) {
+            throw new ApiException(HttpStatus.CONFLICT, "Email has to be unique");
         }
 
         //Konstruktøren hasher passwordet
@@ -89,8 +88,8 @@ public class UserDAO extends GenericDAO<User, Long> implements ISecurityDAO {
     }
 
     @Override
-    public User addUserRole(String username, Roles role) {
-        User user = findByUsername(username);
+    public User addUserRole(String email, Roles role) {
+        User user = findByEmail(email);
         if (user == null) {
             throw new ApiException(HttpStatus.NOT_FOUND, "User could not be found");
         }
