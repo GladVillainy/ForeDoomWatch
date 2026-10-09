@@ -1,4 +1,4 @@
-package dto;
+package security.dto;
 
 public record AuthDTO(
      String username,
