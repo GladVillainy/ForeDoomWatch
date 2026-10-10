@@ -8,6 +8,7 @@ import io.javalin.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routes.Routes;
+import security.controller.AccessController;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,11 +35,14 @@ public class ApplicationConfig {
     public Javalin startServer(int port) {
         app = Javalin.create(this::configuration);
 
+        AccessController accessController = new AccessController();
+        app.beforeMatched(accessController::accessHandler);
+
         app.after(this::afterRequest);
 
         app.exception(ApiException.class, (e, ctx) -> handleError(e.getCode(), e.getMessage(), ctx));
         app.exception(DatabaseException.class, (e, ctx) -> handleError(e.getCode(), e.getMessage(), ctx));
-        app.exception(MissingInputException.class, (e, ctx) -> handleError(e.getCode(), e.getMessage(), ctx));
+        app.exception(ValidationException.class, (e, ctx) -> handleError(e.getCode(), e.getMessage(), ctx));
         app.exception(EntityException.class, (e, ctx) -> handleError(e.getCode(), e.getMessage(), ctx));
 
         app.exception(Exception.class, this::generalExceptionHandler);

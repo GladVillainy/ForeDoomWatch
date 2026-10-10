@@ -3,9 +3,10 @@ package security.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nimbusds.jose.JOSEException;
-import dto.AuthDTO;
+import jakarta.persistence.EntityManagerFactory;
+import security.dto.AuthDTO;
 import exceptions.ApiException;
-import exceptions.MissingInputException;
+import exceptions.ValidationException;
 import security.dao.ISecurityDAO;
 import security.dao.UserDAO;
 import security.entities.Roles;
@@ -19,6 +20,7 @@ import dk.bugelhartmann.UserDTO;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import io.javalin.http.HttpStatus;
+import io.javalin.http.UnauthorizedResponse;
 import io.javalin.security.RouteRole;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -40,7 +42,7 @@ public class SecurityController {
     private static SecurityController instance;
     private static Logger logger = LoggerFactory.getLogger(SecurityController.class);
 
-    private SecurityController() { }
+    public SecurityController() { }
 
     public static SecurityController getInstance() { // Singleton because we don't want multiple instances of the same class
         if (instance == null) {
@@ -50,19 +52,25 @@ public class SecurityController {
         return instance;
     }
 
+    //Ændret: til REST Assured
+    public static SecurityController getInstance(EntityManagerFactory emf) {
+        if (instance == null) {
+            instance = new SecurityController();
+            securityDAO = new UserDAO(emf);
+        }
+        return instance;
+    }
+
 
     public Handler login() {
         return (ctx) -> {
             ObjectNode returnObject = objectMapper.createObjectNode(); // for sending json messages back to the client
-            // ÆNDRET: ingen try/catch, DAO håndter
-            UserDTO user = ctx.bodyAsClass(UserDTO.class);
-
-            // ÆNDRET: uden password ville BCrypt give NullPointerException (500)
-            MissingInputException.requireValue(user.getPassword(), "password", "User");
-
-            // ÆNDRET: getVerifiedUser returnerer din User
-            User verifiedUser = securityDAO.getVerifiedUser(user.getUsername(), user.getPassword());
-            String token = createToken(new UserDTO(verifiedUser.getUsername(), verifiedUser.getRolesAsStrings()));
+            // ÆNDRET: login med email og password
+            AuthDTO user = ctx.bodyAsClass(AuthDTO.class);
+            ValidationException.requireValue(user.password(), "password", "User");
+            // ÆNDRET: getVerifiedUser returnerer User
+            User verifiedUser = securityDAO.getVerifiedUser(user.email(), user.password());
+            String token = createToken(new UserDTO(verifiedUser.getEmail(), verifiedUser.getRolesAsStrings()));
 
             ctx.status(200).json(returnObject
                     .put("token", token)
@@ -74,25 +82,22 @@ public class SecurityController {
     public Handler register() {
         return (ctx) -> {
             ObjectNode returnObject = objectMapper.createObjectNode();
-
-            // ÆNDRET: AuthDTO i stedet for UserDTO
+            // ÆNDRET: Ingen try/catch (DAO kaster ApiException 409)
             AuthDTO userInput = ctx.bodyAsClass(AuthDTO.class);
-
-            // ÆNDRET: createUser tager email og kaster ApiException (409), hvis brugernavnet findes
             User created = securityDAO.createUser(userInput.username(), userInput.email(), userInput.password());
 
-            // ÆNDRET: roller fra brugeren
-            String token = createToken(new UserDTO(created.getUsername(), created.getRolesAsStrings()));
+            String token = createToken(new UserDTO(created.getEmail(), created.getRolesAsStrings()));
             ctx.status(HttpStatus.CREATED).json(returnObject
                     .put("token", token)
-                    .put("username", created.getUsername()));
+                    .put("username", created.getUsername())
+                    .put("email", created.getEmail()));
         };
     }
 
 
+    public Handler authenticate() throws UnauthorizedResponse {
 
-    public Handler authenticate() {
-
+        ObjectNode returnObject = objectMapper.createObjectNode();
         return (ctx) -> {
             // This is a preflight request => OK
             if (ctx.method().toString().equals("OPTIONS")) {
@@ -101,19 +106,19 @@ public class SecurityController {
             }
             String header = ctx.header("Authorization");
             if (header == null) {
-                throw new ApiException(HttpStatus.UNAUTHORIZED, "Authorization header missing");
+                throw new UnauthorizedResponse("Authorization header missing");
             }
 
             String[] headerParts = header.split(" ");
             if (headerParts.length != 2) {
-                throw new ApiException(HttpStatus.UNAUTHORIZED, "Authorization header malformed");
+                throw new UnauthorizedResponse("Authorization header malformed");
             }
 
             String token = headerParts[1];
             UserDTO verifiedTokenUser = verifyToken(token);
 
             if (verifiedTokenUser == null) {
-                throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid User or Token");
+                throw new UnauthorizedResponse("Invalid User or Token");
             }
             logger.info("User verified: " + verifiedTokenUser);
             ctx.attribute("user", verifiedTokenUser);
@@ -124,8 +129,7 @@ public class SecurityController {
     // Check if the user's roles contain any of the allowed roles
     public boolean authorize(UserDTO user, Set<RouteRole> allowedRoles) {
         if (user == null) {
-            // ÆNDRET: ApiException i stedet for UnauthorizedResponse
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "You need to log in");
+            throw new UnauthorizedResponse("You need to log in, dude!");
         }
         Set<String> roleNames = allowedRoles.stream()
                 .map(RouteRole::toString)  // Convert RouteRoles to  Set of Strings
@@ -140,7 +144,7 @@ public class SecurityController {
         try {
             String ISSUER;
             String TOKEN_EXPIRE_TIME;
-            // ÆNDRET: SECRET_KEY kommer fra miljøvariabel
+            // ÆNDRET: SECRET_KEY fra miljøvariabel
             String SECRET_KEY = System.getenv("SECRET_KEY");
 
             if (SECRET_KEY == null || SECRET_KEY.isBlank()) {
@@ -157,7 +161,7 @@ public class SecurityController {
             return tokenSecurity.createToken(user, ISSUER, TOKEN_EXPIRE_TIME, SECRET_KEY);
         } catch (Exception e) {
             e.printStackTrace();
-            // ÆNDRET: HttpStatus i stedet for int
+            // ÆNDRET: ApiException tager HttpStatus
             throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not create token");
         }
     }
@@ -187,7 +191,7 @@ public class SecurityController {
             String newRole = ctx.bodyAsClass(ObjectNode.class).get("role").asText();
             UserDTO user = ctx.attribute("user");
 
-            // ÆNDRET: Tilpasset til DAO (username, Roles).
+            // ÆNDRET: DAO tager (username, Roles).
             Roles role;
             try {
                 role = Roles.valueOf(newRole.toUpperCase());

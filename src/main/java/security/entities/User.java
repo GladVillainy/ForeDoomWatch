@@ -19,7 +19,9 @@ public class User implements IEntity<Long>, ISecurityUser {
     @Column(name = "user_id")
     private long userId;
 
+    @Column(unique = true)
     private String email;
+
     private String username;
 
 

@@ -1,6 +1,7 @@
 package security.entities;
+import io.javalin.security.RouteRole;
 
-public enum Roles {
+public enum Roles implements RouteRole {
     ANYONE(1),
     USER(2),
     ADMIN(3);
