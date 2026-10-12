@@ -48,9 +48,11 @@ public class FindingController {
 
     public void updateStatus(Context ctx){
         //få info
-        User user = getLoggedInUser(ctx);
+        Long id = getLongId(ctx);
+        ValidationException.requireValue(id, "Id", "Finding");
+
         FindingDTO findingDTO = ctx.bodyAsClass(FindingDTO.class);
-        Finding finding = findingDAO.read(user.getID());
+        Finding finding = findingDAO.read(id);
 
         ValidationException.validateOwnership(finding.getSoftware().getHost(), getLoggedInUser(ctx));
 
@@ -91,5 +93,9 @@ public class FindingController {
         UserDTO loggedUser = ctx.attribute("user");
         User user = userDAO.findByEmail(loggedUser.getUsername());
         return user;
+    }
+
+    private Long getLongId(Context ctx) {
+        return ctx.pathParamAsClass("id", Long.class).get();
     }
 }

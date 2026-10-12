@@ -5,7 +5,9 @@ import dto.nvd.NVDDTO;
 import exceptions.ApiException;
 import io.javalin.http.HttpStatus;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -36,9 +38,12 @@ public class APIUtils {
                 throw new RuntimeException("GET request failed. Status code: " + response.statusCode());
             }
             return response.body();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
+        } catch (ApiException e) {
+            throw e;
+        } catch (IOException | URISyntaxException e){
+            throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "Could not reach external API");
+        } catch (InterruptedException e) {
+            throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "Request to the external API was interrupted");
         }
     }
 
