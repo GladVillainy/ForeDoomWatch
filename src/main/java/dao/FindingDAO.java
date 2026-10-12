@@ -14,10 +14,13 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Data access object(DAO) for the entities of type {@link Finding}
- * FindingDAO extends {@link GenericDAO}, therefor inherits the same CRUD (Create, Read, Update, Delete)
- * methods from sup{@link GenericDAO}
- * The DAO contains 2 custom methods: {@link sortByStatusAscending} and {@link sortByStatusDescending}
+ * Data access object(DAO) for the entities of type {@link Finding}.
+ * FindingDAO extends {@link GenericDAO}, therefore inherits the same CRUD (Create, Read, Update, Delete)
+ * methods from {@link GenericDAO}.
+ * The DAO contains custom methods for sorting a user's findings by status or CVSS score:
+ * {@link #sortByStatusAscending(Long)}, {@link #sortByStatusDescending(Long)},
+ * {@link #sortCvssAscending(Long)} and {@link #sortCvssDescending(Long)},
+ * and {@link #doesItExist(Long, String)} to check for duplicates.
  */
 public class FindingDAO extends GenericDAO<Finding, Long> {
     public FindingDAO(EntityManagerFactory emf) {
@@ -26,8 +29,8 @@ public class FindingDAO extends GenericDAO<Finding, Long> {
 
 
     /**
-     * Retrieves all findings that belongings to the given user, sorted by finding status based on enums field order (int)
-     * * {@link FindingStatus} (OPEN = 1, IN_PROGRESS = 2, RESOLVED = 3).
+     * Retrieves all findings that belong to the given user, sorted by finding status based on the enum's
+     * order field {@link FindingStatus} (OPEN = 1, IN_PROGRESS = 2, RESOLVED = 3).
      *
      * @param userId the id of the user who owns the findings
      * @return a list of the users findings sorted by status, empty if none exist
@@ -61,10 +64,10 @@ public class FindingDAO extends GenericDAO<Finding, Long> {
             }
         }
     }
-    
+
     /**
-     * Retrieves all findings that belong to the given user, sorted by status in reverse order. Uses {@link sortCvss}
-     * of the order field in {@link FindingStatus} (RESOLVED = 3, IN_PROGRESS = 2, OPEN = 1).
+     * Retrieves all findings that belong to the given user, sorted by status in reverse order
+     * (RESOLVED, IN_PROGRESS, OPEN). Uses {@link #sortByStatusAscending(Long)}.
      *
      * @param userId the id of the user who owns the findings
      * @return a list of the user's findings sorted by status in descending order, empty if none exist
@@ -76,11 +79,11 @@ public class FindingDAO extends GenericDAO<Finding, Long> {
     }
 
     /**
-     * Retrieves all findings that belong to the given user, sorted by status in natural order. Uses {@link sortCvss}
-     * of the order field in {@link FindingStatus} (RESOLVED = 3, IN_PROGRESS = 2, OPEN = 1).
+     * Retrieves all findings that belong to the given user, sorted by cvss score in ascending order.
+     * Findings without a cvss score are placed last. Uses {@link #sortCvss(Long, Comparator)}.
      *
      * @param userId the id of the user who owns the findings
-     * @return a list of the user's findings sorted by status in descending order, empty if none exist
+     * @return a list of the user's findings sorted by cvss score in ascending order, empty if none exist
      * @throws ValidationException if userId is null (status code 400)
      * @throws DatabaseException   if the database query fails (status code 500)
      */
@@ -89,8 +92,21 @@ public class FindingDAO extends GenericDAO<Finding, Long> {
     }
 
     /**
-     * Retrives findings based on the user id from param, and sorts it based on the comparator order.
-     * Uses {@link cvssScoreOrNull} to prevent {@link NullPointerException} when sorting
+     * Retrieves all findings that belong to the given user, sorted by cvss score in descending order.
+     * Findings without a cvss score are placed last. Uses {@link #sortCvss(Long, Comparator)}.
+     *
+     * @param userId the id of the user who owns the findings
+     * @return a list of the user's findings sorted by cvss score in descending order, empty if none exist
+     * @throws ValidationException if userId is null (status code 400)
+     * @throws DatabaseException   if the database query fails (status code 500)
+     */
+    public List<Finding> sortCvssDescending(Long userId) {
+        return sortCvssAscending(userId).reversed();
+    }
+
+    /**
+     * Retrieves findings for the given user and sorts them by CVSS score using the given comparator.
+     * Uses {@link #cvssScoreOrNull(Finding)} to prevent {@link NullPointerException} when sorting.
      *
      * @param userId the id of the user who owns the findings
      * @param order  how the cvss needs to be sorted
@@ -127,9 +143,10 @@ public class FindingDAO extends GenericDAO<Finding, Long> {
     }
 
     /**
-     * Helping method used in {@link sortCvss} to prevent {@link NullPointerException} in streams sorting
+     * Helper method used in {@link #sortCvss(Long, Comparator)} to prevent a {@link NullPointerException}
+     * when sorting.
      *
-     * @param finding the finding that needs to be check if it includes a null
+     * @param finding the finding to read the CVSS score from
      * @return the cvss score, or null if the vulnerability or its metrics are missing
      */
     private Double cvssScoreOrNull(Finding finding) {
@@ -141,16 +158,14 @@ public class FindingDAO extends GenericDAO<Finding, Long> {
         return finding.getVulnerability().getMetrics().getCvssScore();
     }
 
-    public List<Finding> sortCvssDescending(Long userId) {
-        return sortCvssAscending(userId).reversed();
-    }
-
     /**
      * Check whether a finding already exists
      *
-     * @param softwareId      id of the software
+     * @param softwareId id of the software
      * @param vulnerabilityId the cve id from vulnerability
-     * @return
+     * @return true if a finding for this software and vulnerability already exists, otherwise false
+     * @throws ValidationException if softwareId or vulnerabilityId is null (status code 400)
+     * @throws DatabaseException   if the database query fails (status code 500)
      */
     public boolean doesItExist(Long softwareId, String vulnerabilityId) {
         ValidationException.requireValue(softwareId, "software", "id");
