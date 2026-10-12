@@ -2,32 +2,38 @@ package controller;
 
 import dao.HostDAO;
 import dao.SoftwareDAO;
+import dk.bugelhartmann.UserDTO;
 import dto.FindingDTO;
 import dto.FindingDetailDTO;
 import dto.SoftwareDTO;
 import entities.Finding;
 import entities.Host;
 import entities.Software;
+import exceptions.ValidationException;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import mapper.FindingMapper;
 import mapper.SoftwareMapper;
+import security.dao.UserDAO;
+import security.entities.User;
 import utils.Service;
 
 import java.util.List;
 import java.util.Map;
 
 public class SoftwareController implements IController {
-    private final SoftwareMapper softwareMapper;
-    private final SoftwareDAO softwareDAO;
-    private final HostDAO hostDAO;
-    private final Service service;
-    private final FindingMapper findingMapper;
+    private SoftwareMapper softwareMapper;
+    private SoftwareDAO softwareDAO;
+    private UserDAO userDAO;
+    private HostDAO hostDAO;
+    private Service service;
+    private FindingMapper findingMapper;
 
-    public SoftwareController(SoftwareMapper softwareMapper, SoftwareDAO softwareDAO, HostDAO hostDAO,
-                              Service service, FindingMapper findingMapper) {
+    public SoftwareController(SoftwareMapper softwareMapper, SoftwareDAO softwareDAO, UserDAO userDAO,
+                              HostDAO hostDAO, Service service, FindingMapper findingMapper) {
         this.softwareMapper = softwareMapper;
         this.softwareDAO = softwareDAO;
+        this.userDAO = userDAO;
         this.hostDAO = hostDAO;
         this.service = service;
         this.findingMapper = findingMapper;
@@ -35,7 +41,10 @@ public class SoftwareController implements IController {
 
     @Override
     public void getAll(Context ctx) {
-        List<Software> softwareList = softwareDAO.readAll();
+        User user = getLoggedInUser(ctx);
+
+        List<Software> softwareList = softwareDAO.readByUser(user.getID());
+
         List<SoftwareDTO> softwareDTOList = softwareMapper.toDTOList(softwareList);
 
         ctx.status(HttpStatus.OK);
@@ -46,6 +55,7 @@ public class SoftwareController implements IController {
     public void getById(Context ctx) {
         long id = getLongId(ctx);
         Software software = softwareDAO.read(id);
+        ValidationException.validateOwnership(software.getHost(), getLoggedInUser(ctx));
 
         SoftwareDTO softwareDTO = softwareMapper.toDTO(software);
         ctx.status(HttpStatus.OK);
@@ -56,6 +66,7 @@ public class SoftwareController implements IController {
     public void create(Context ctx) {
         long hostId = ctx.pathParamAsClass("hostId", Long.class).get();
         Host host = hostDAO.read(hostId);
+        ValidationException.validateOwnership(host, getLoggedInUser(ctx));
 
         SoftwareDTO softwareDTO = ctx.bodyAsClass(SoftwareDTO.class);
         Software software = softwareMapper.toEntity(softwareDTO);
@@ -74,6 +85,7 @@ public class SoftwareController implements IController {
 
         SoftwareDTO softwareDTO = ctx.bodyAsClass(SoftwareDTO.class);
         Software software = softwareDAO.read(id);
+        ValidationException.validateOwnership(software.getHost(), getLoggedInUser(ctx));
 
         software.setSoftwareName(softwareDTO.softwareName());
         software.setVersion(softwareDTO.version());
@@ -89,6 +101,8 @@ public class SoftwareController implements IController {
     @Override
     public void delete(Context ctx) {
         long id = getLongId(ctx);
+        Software software = softwareDAO.read(id);
+        ValidationException.validateOwnership(software.getHost(), getLoggedInUser(ctx));
 
         softwareDAO.delete(id);
         ctx.status(HttpStatus.OK);
@@ -99,6 +113,9 @@ public class SoftwareController implements IController {
     public void scan(Context ctx) {
         // Hent id fra url og kald find findVulnerabilities
         long id = getLongId(ctx);
+        Software software = softwareDAO.read(id);
+        ValidationException.validateOwnership(software.getHost(), getLoggedInUser(ctx));
+
         List<Finding> findings = service.findVulnerabilities(id);
 
         // Lav listen af Finding om til en liste af FindingDetailDTO
@@ -112,6 +129,8 @@ public class SoftwareController implements IController {
     public void getByHost(Context ctx) {
         // Hent hostId fra url
         long hostId = ctx.pathParamAsClass("hostId", Long.class).get();
+        Host host = hostDAO.read(hostId);
+        ValidationException.validateOwnership(host, getLoggedInUser(ctx));
 
         // Tjek ellers kaster read en 404
         hostDAO.read(hostId);
@@ -121,5 +140,16 @@ public class SoftwareController implements IController {
 
         ctx.status(HttpStatus.OK);
         ctx.json(softwareDTOList);
+    }
+
+
+
+    private User getLoggedInUser(Context ctx) {
+        //I tokenet ligger emailen i username-feltet
+        //Grundet at det ikke er min kode, og fra kursusmateriale tør jeg ikke at røre for meget ved den
+        //Så længe den virker :)
+        UserDTO loggedUser = ctx.attribute("user");
+        User user = userDAO.findByEmail(loggedUser.getUsername());
+        return user;
     }
 }

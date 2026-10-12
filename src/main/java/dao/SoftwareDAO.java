@@ -1,5 +1,6 @@
 package dao;
 
+import entities.Host;
 import entities.Software;
 import exceptions.DatabaseException;
 import exceptions.ValidationException;
@@ -47,6 +48,22 @@ public class SoftwareDAO extends GenericDAO<Software, Long> {
             } catch (PersistenceException e) {
                 throw new DatabaseException(HttpStatus.INTERNAL_SERVER_ERROR,
                         "Getting software failed with error: " + e.getMessage());
+            }
+        }
+    }
+
+    public List<Software> readByUser(Long userId) {
+        ValidationException.requireValue(userId, "id", "User");
+        try (EntityManager entityManager = emf.createEntityManager()) {
+            String jpql = "SELECT s FROM Software s WHERE s.host.user.userId = :userId";
+            try {
+                TypedQuery<Software> query = entityManager.createQuery(jpql, Software.class);
+                query.setParameter("userId", userId);
+                List<Software> resultList = query.getResultList();
+                return resultList;
+            } catch (PersistenceException e) {
+                throw new DatabaseException(HttpStatus.INTERNAL_SERVER_ERROR, "Get Software " +
+                        "has failed with error message" + e.getMessage());
             }
         }
     }
