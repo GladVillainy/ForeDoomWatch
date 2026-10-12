@@ -71,9 +71,16 @@ public class Service {
 
         // Gem hver Vulnerability
         for (Vulnerability v : vulnerabilities) {
-            vulnerabilityDAO.create(v);
+            //Tjek om den allerede findes, ellers create
+            if(!vulnerabilityDAO.doesItExist(v.getVulnerabilityId())){
+                vulnerabilityDAO.create(v);
+            }
+
 
             // For hver Vulnerability lav et Finding, der peger på softwaren og vulnerabilityen og gem
+            if (findingDAO.doesItExist(softwareId, v.getVulnerabilityId())){
+             continue;
+            }
             Finding finding = Finding.builder()
                     .detectedAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
