@@ -1,8 +1,11 @@
 package exceptions;
 
+import entities.Host;
+import entities.Software;
 import io.javalin.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import security.entities.User;
 
 /**
  * Custom unchecked exception that extends {@link RuntimeException} and carries an HTTP status code and the error message.
@@ -85,4 +88,20 @@ public class ValidationException extends RuntimeException {
             throw new ValidationException(HttpStatus.BAD_REQUEST, "Email is not valid");
         }
     }
+
+    public static void validateOwnership(Host host, User user) {
+        //Gamle hosts uden ejer tæller også som ikke ens egne
+        if (host.getUser() == null || !host.getUser().getID().equals(user.getID())) {
+            throw new ValidationException(HttpStatus.FORBIDDEN, "You do not own this host");
+        }
+    }
+
+    public static void validateOwnership(Software software, User user) {
+        //Gamle hosts uden ejer tæller også som ikke ens egne
+        if (software.getHost().getUser() == null || !software.getHost().getUser().getID().equals(user.getID())) {
+            throw new ValidationException(HttpStatus.FORBIDDEN, "You do not own this host");
+        }
+    }
+
+
 }
