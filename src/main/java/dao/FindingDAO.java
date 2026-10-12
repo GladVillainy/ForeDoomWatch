@@ -106,5 +106,31 @@ public class FindingDAO extends GenericDAO<Finding,Long> {
         return sortCvssAscending(userId).reversed();
     }
 
+    /**
+     * Check whether a finding already exists
+     * @param softwareId id of the software
+     * @param vulnerabilityId the cve id from vulnerability
+     * @return
+     */
+    public boolean doesItExist(Long softwareId, String vulnerabilityId){
+        ValidationException.requireValue(softwareId, "software", "id");
+        ValidationException.requireValue(vulnerabilityId, "Vulnerability", "id");
 
+        try(EntityManager entityManager = emf.createEntityManager()){
+            String jpql = "SELECT count(f) from Finding  f where f.software.softwareId = " +
+                    ":softwareId and f.vulnerability.vulnerabilityId = :vulnerabilityId";
+
+            try{
+                TypedQuery<Long> query = entityManager.createQuery(jpql, Long.class);
+                query.setParameter("softwareId", softwareId);
+                query.setParameter("vulnerabilityId", vulnerabilityId);
+
+                return query.getSingleResult() > 0;
+            } catch (Exception e) {
+                throw new DatabaseException(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Fetching data failed with error message: " + e);
+            }
+        }
+
+    }
 }
