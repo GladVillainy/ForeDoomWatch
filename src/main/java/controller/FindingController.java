@@ -26,9 +26,9 @@ public class FindingController {
     }
 
     public void sortStatusByAscending(Context ctx){
-        long id = getLongId(ctx);
+        User user = getLoggedInUser(ctx);
 
-        List<Finding> findingList = findingDAO.sortByStatusAscending(id);
+        List<Finding> findingList = findingDAO.sortByStatusAscending(user.getID());
         List<FindingDetailDTO> findingDTOS = findingMapper.toDetailDTOList(findingList);
 
         ctx.status(HttpStatus.OK);
@@ -37,9 +37,9 @@ public class FindingController {
     }
 
     public void sortStatusByDescending(Context ctx){
-        long id = getLongId(ctx);
+        User user = getLoggedInUser(ctx);
 
-        List<Finding> findingList = findingDAO.sortByStatusDescending(id);
+        List<Finding> findingList = findingDAO.sortByStatusDescending(user.getID());
         List<FindingDetailDTO> findingDTOS = findingMapper.toDetailDTOList(findingList);
 
         ctx.status(HttpStatus.OK);
@@ -48,9 +48,9 @@ public class FindingController {
 
     public void updateStatus(Context ctx){
         //få info
-        long id = getLongId(ctx);
+        User user = getLoggedInUser(ctx);
         FindingDTO findingDTO = ctx.bodyAsClass(FindingDTO.class);
-        Finding finding = findingDAO.read(id);
+        Finding finding = findingDAO.read(user.getID());
 
         ValidationException.validateOwnership(finding.getSoftware().getHost(), getLoggedInUser(ctx));
 
@@ -65,9 +65,9 @@ public class FindingController {
     }
 
     public void sortCvssByAscending(Context ctx){
-        long id = getLongId(ctx);
+        User user = getLoggedInUser(ctx);
 
-        List<Finding> findingList = findingDAO.sortCvssAscending(id);
+        List<Finding> findingList = findingDAO.sortCvssAscending(user.getID());
         List<FindingDetailDTO> findingDTOS = findingMapper.toDetailDTOList(findingList);
 
         ctx.status(HttpStatus.OK);
@@ -75,18 +75,13 @@ public class FindingController {
     }
 
     public void sortCvssByDescending(Context ctx){
-        long id = getLongId(ctx);
+        User user = getLoggedInUser(ctx);
 
-        List<Finding> findingList = findingDAO.sortCvssDescending(id);
+        List<Finding> findingList = findingDAO.sortCvssDescending(user.getID());
         List<FindingDetailDTO> findingDTOS = findingMapper.toDetailDTOList(findingList);
 
         ctx.status(HttpStatus.OK);
         ctx.json(findingDTOS);
-    }
-
-
-    private long getLongId(Context ctx) {
-        return ctx.pathParamAsClass("id", Long.class).get();
     }
 
     private User getLoggedInUser(Context ctx) {
