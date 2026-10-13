@@ -1,5 +1,6 @@
 package exceptions;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import entities.Host;
 import entities.Software;
 import io.javalin.http.HttpStatus;
@@ -49,15 +50,14 @@ public class ValidationException extends RuntimeException {
     }
 
     /**
-     * Overload of {@link #requireValue(String, String, String)} for Long values
-     * Only checks for null.
+     * Checks that the given object is not null. Used for Long, enums and other non-String values.
      *
      * @param value     the value to check
-     * @param fieldName the name of the field being checked, like "name" or "id"
-     * @param inputType the name of the entity the field belongs, like "Host" or "User"
+     * @param fieldName the name of the field being checked, like "id" or "status"
+     * @param inputType the name of the entity the field belongs to, like "Host" or "Finding"
      * @throws ValidationException if the value is null (status code 400)
      */
-    public static void requireValue(Long value, String fieldName, String inputType) {
+    public static void requireValue(Object value, String fieldName, String inputType) {
         if (value == null) {
             throw new ValidationException(HttpStatus.BAD_REQUEST,
                     inputType + " " + fieldName + " cannot be empty");

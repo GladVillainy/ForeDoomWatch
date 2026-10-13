@@ -5,6 +5,7 @@ import dk.bugelhartmann.UserDTO;
 import dto.FindingDetailDTO;
 import dto.FindingDTO;
 import entities.Finding;
+import entities.FindingStatus;
 import exceptions.ValidationException;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
@@ -13,6 +14,7 @@ import security.dao.UserDAO;
 import security.entities.User;
 import utils.AuthUtil;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class FindingController {
@@ -50,18 +52,26 @@ public class FindingController {
     public void updateStatus(Context ctx){
         //få info
         Long id = getLongId(ctx);
-        ValidationException.requireValue(id, "Id", "Finding");
-
-        FindingDTO findingDTO = ctx.bodyAsClass(FindingDTO.class);
         Finding finding = findingDAO.read(id);
 
-        ValidationException.validateOwnership(finding.getSoftware().getHost(), AuthUtil.getLoggedInUser(ctx, userDAO));
+        ValidationException.validateOwnership(finding.getSoftware(), AuthUtil.getLoggedInUser(ctx, userDAO));
+        FindingDTO findingDTO = ctx.bodyAsClass(FindingDTO.class);
+
+
+        ValidationException.requireValue(findingDTO.status(), "status", "Finding");
 
         finding.setStatus(findingDTO.status());
+        finding.setUpdatedAt(LocalDateTime.now());
+
+        if (findingDTO.status() == FindingStatus.RESOLVED) {
+            finding.setResolvedAt(LocalDateTime.now());
+        } else {
+            finding.setResolvedAt(null);
+        }
 
         Finding updatedFinding = findingDAO.update(finding);
-
         FindingDTO findingDTOUpdated = findingMapper.toDTO(updatedFinding);
+
         ctx.status(HttpStatus.OK);
         ctx.json(findingDTOUpdated);
 
@@ -86,6 +96,7 @@ public class FindingController {
         ctx.status(HttpStatus.OK);
         ctx.json(findingDTOS);
     }
+
 
 
     private Long getLongId(Context ctx) {

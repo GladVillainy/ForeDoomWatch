@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import security.entities.User;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity @Setter @NoArgsConstructor
 @AllArgsConstructor @Builder @Getter
 public class Host implements IEntity {
@@ -22,19 +25,16 @@ public class Host implements IEntity {
         this.hostDescription = hostDescription;
     }
 
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
-    }
 
-    public void setHostDescription(String hostDescription) {
-        this.hostDescription = hostDescription;
-    }
 
     //Relation
     @ManyToOne
-    @JoinColumn(name = "user_user_id")
+    @JoinColumn(name = "user_id")
     private User user;
     public void setUser(User user) {this.user = user;}
+
+    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL)
+    private List<Software> softwareList;
 
     @Override
     public Long getID() {

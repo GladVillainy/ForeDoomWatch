@@ -24,7 +24,6 @@ public class Software implements IEntity<Long> {
     private List<Finding> finding;
 
     @ManyToOne
-    @JoinColumn(name = "host_id")
     private Host host;
 
     @Override
