@@ -89,15 +89,30 @@ public class ValidationException extends RuntimeException {
         }
     }
 
+    /**
+     * Checks that the given user owns the host.
+     *
+     * @param host the host the user wants to access
+     * @param user the logged in user that needs validation
+     * @throws ValidationException if the host is null, has no owner, or the owner's id does not match the user's id
+     *                             (status code 403)
+     */
     public static void validateOwnership(Host host, User user) {
-        //Gamle hosts uden ejer tæller også som ikke ens egne
         if (host.getUser() == null || !host.getUser().getID().equals(user.getID())) {
             throw new ValidationException(HttpStatus.FORBIDDEN, "You do not own this host");
         }
     }
 
+    /**
+     * Checks that the given user owns the software, by validating ownership of the host the software belongs to.
+     * Overloaded method {@link #validateOwnership(Host, User)}.
+     *
+     * @param software the software the user wants to access
+     * @param user     the logged in user that needs validation
+     * @throws ValidationException if the software has no host, or the host's owner is not the given user
+     *                             (status code 403)
+     */
     public static void validateOwnership(Software software, User user) {
-        //Gamle hosts uden ejer tæller også som ikke ens egne
         if (software.getHost().getUser() == null || !software.getHost().getUser().getID().equals(user.getID())) {
             throw new ValidationException(HttpStatus.FORBIDDEN, "You do not own this host");
         }

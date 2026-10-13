@@ -38,7 +38,7 @@ public class FindingDAO extends GenericDAO<Finding, Long> {
      * @throws ValidationException if user id is null (400)
      */
     public List<Finding> sortByStatusAscending(Long userId) {
-        ValidationException.requireValue(userId, "id", "User");
+        ValidationException.requireValue(userId, "user", "id");
         // Åbn en EntityManager med try-with-resources
         try (EntityManager entityManager = emf.createEntityManager()) {
             //sorterer efter jpql status
@@ -168,8 +168,8 @@ public class FindingDAO extends GenericDAO<Finding, Long> {
      * @throws DatabaseException   if the database query fails (status code 500)
      */
     public boolean doesItExist(Long softwareId, String vulnerabilityId) {
-        ValidationException.requireValue(softwareId, "software", "id");
-        ValidationException.requireValue(vulnerabilityId, "Vulnerability", "id");
+        ValidationException.requireValue(softwareId, "id", "software");
+        ValidationException.requireValue(vulnerabilityId, "id", "vulnerability");
 
         try (EntityManager entityManager = emf.createEntityManager()) {
             String jpql = "SELECT count(f) from Finding  f where f.software.softwareId = " +

@@ -16,6 +16,7 @@ import mapper.FindingMapper;
 import mapper.SoftwareMapper;
 import security.dao.UserDAO;
 import security.entities.User;
+import utils.AuthUtil;
 import utils.Service;
 
 import java.util.List;
@@ -41,10 +42,9 @@ public class SoftwareController implements IController {
 
     @Override
     public void getAll(Context ctx) {
-        User user = getLoggedInUser(ctx);
+        User user = AuthUtil.getLoggedInUser(ctx, userDAO);
 
         List<Software> softwareList = softwareDAO.readByUser(user.getID());
-
         List<SoftwareDTO> softwareDTOList = softwareMapper.toDTOList(softwareList);
 
         ctx.status(HttpStatus.OK);
@@ -55,7 +55,7 @@ public class SoftwareController implements IController {
     public void getById(Context ctx) {
         long id = getLongId(ctx);
         Software software = softwareDAO.read(id);
-        ValidationException.validateOwnership(software.getHost(), getLoggedInUser(ctx));
+        ValidationException.validateOwnership(software, AuthUtil.getLoggedInUser(ctx, userDAO));
 
         SoftwareDTO softwareDTO = softwareMapper.toDTO(software);
         ctx.status(HttpStatus.OK);
@@ -65,8 +65,9 @@ public class SoftwareController implements IController {
     @Override
     public void create(Context ctx) {
         long hostId = ctx.pathParamAsClass("hostId", Long.class).get();
+
         Host host = hostDAO.read(hostId);
-        ValidationException.validateOwnership(host, getLoggedInUser(ctx));
+        ValidationException.validateOwnership(host, AuthUtil.getLoggedInUser(ctx, userDAO));
 
         SoftwareDTO softwareDTO = ctx.bodyAsClass(SoftwareDTO.class);
         Software software = softwareMapper.toEntity(softwareDTO);
@@ -83,10 +84,10 @@ public class SoftwareController implements IController {
     public void update(Context ctx) {
         long id = getLongId(ctx);
 
-        SoftwareDTO softwareDTO = ctx.bodyAsClass(SoftwareDTO.class);
         Software software = softwareDAO.read(id);
-        ValidationException.validateOwnership(software.getHost(), getLoggedInUser(ctx));
+        ValidationException.validateOwnership(software, AuthUtil.getLoggedInUser(ctx, userDAO));
 
+        SoftwareDTO softwareDTO = ctx.bodyAsClass(SoftwareDTO.class);
         software.setSoftwareName(softwareDTO.softwareName());
         software.setVersion(softwareDTO.version());
         software.setVendor(softwareDTO.vendor());
@@ -102,7 +103,7 @@ public class SoftwareController implements IController {
     public void delete(Context ctx) {
         long id = getLongId(ctx);
         Software software = softwareDAO.read(id);
-        ValidationException.validateOwnership(software.getHost(), getLoggedInUser(ctx));
+        ValidationException.validateOwnership(software, AuthUtil.getLoggedInUser(ctx, userDAO));
 
         softwareDAO.delete(id);
         ctx.status(HttpStatus.OK);
@@ -114,7 +115,7 @@ public class SoftwareController implements IController {
         // Hent id fra url og kald find findVulnerabilities
         long id = getLongId(ctx);
         Software software = softwareDAO.read(id);
-        ValidationException.validateOwnership(software.getHost(), getLoggedInUser(ctx));
+        ValidationException.validateOwnership(software, AuthUtil.getLoggedInUser(ctx, userDAO));
 
         List<Finding> findings = service.findVulnerabilities(id);
 
@@ -130,26 +131,12 @@ public class SoftwareController implements IController {
         // Hent hostId fra url
         long hostId = ctx.pathParamAsClass("hostId", Long.class).get();
         Host host = hostDAO.read(hostId);
-        ValidationException.validateOwnership(host, getLoggedInUser(ctx));
-
-        // Tjek ellers kaster read en 404
-        hostDAO.read(hostId);
+        ValidationException.validateOwnership(host, AuthUtil.getLoggedInUser(ctx, userDAO));
 
         List<Software> softwares = softwareDAO.readByHost(hostId);
         List<SoftwareDTO> softwareDTOList = softwareMapper.toDTOList(softwares);
 
         ctx.status(HttpStatus.OK);
         ctx.json(softwareDTOList);
-    }
-
-
-
-    private User getLoggedInUser(Context ctx) {
-        //I tokenet ligger emailen i username-feltet
-        //Grundet at det ikke er min kode, og fra kursusmateriale tør jeg ikke at røre for meget ved den
-        //Så længe den virker :)
-        UserDTO loggedUser = ctx.attribute("user");
-        User user = userDAO.findByEmail(loggedUser.getUsername());
-        return user;
     }
 }

@@ -10,6 +10,7 @@ import mapper.HostMapper;
 import io.javalin.http.Context;
 import security.dao.UserDAO;
 import security.entities.User;
+import utils.AuthUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class HostController implements IController {
     @Override
     public void getAll(Context ctx) {
         //hent user
-        User user = getLoggedInUser(ctx);
+        User user = AuthUtil.getLoggedInUser(ctx, userDAO);
 
         List<Host> hostList = hostDAO.findByUserId(user.getID());
 
@@ -45,7 +46,7 @@ public class HostController implements IController {
         long id = getLongId(ctx);
         Host host = hostDAO.read(id);
 
-        ValidationException.validateOwnership(host, getLoggedInUser(ctx));
+        ValidationException.validateOwnership(host, AuthUtil.getLoggedInUser(ctx, userDAO));
         //Lav om til dto
         HostDTO hostDTO = hostMapper.toDTO(host);
         ctx.status(HttpStatus.OK);
@@ -54,7 +55,7 @@ public class HostController implements IController {
 
     public void create(Context ctx) {
         //hent user
-        User user = getLoggedInUser(ctx);
+        User user = AuthUtil.getLoggedInUser(ctx, userDAO);
 
         //Få host
         HostDTO hostDTO = ctx.bodyAsClass(HostDTO.class);
@@ -79,7 +80,7 @@ public class HostController implements IController {
         Host host = hostDAO.read(id);
 
         //validate ownership
-        ValidationException.validateOwnership(host, getLoggedInUser(ctx));
+        ValidationException.validateOwnership(host,AuthUtil.getLoggedInUser(ctx, userDAO));
 
         host.setHostDescription(hostDTO.hostDescription());
         host.setHostName(hostDTO.hostname());
@@ -96,7 +97,7 @@ public class HostController implements IController {
     public void delete(Context ctx) {
         long id = getLongId(ctx);
         Host host = hostDAO.read(id);
-        ValidationException.validateOwnership(host, getLoggedInUser(ctx));
+        ValidationException.validateOwnership(host, AuthUtil.getLoggedInUser(ctx, userDAO));
         hostDAO.delete(id);
 
         ctx.status(HttpStatus.OK);
@@ -105,12 +106,4 @@ public class HostController implements IController {
     }
 
 
-    private User getLoggedInUser(Context ctx) {
-        //I tokenet ligger emailen i username-feltet
-        //Grundet at det ikke er min kode, og fra kursusmateriale tør jeg ikke at røre for meget ved den
-        //Så længe den virker :)
-        UserDTO loggedUser = ctx.attribute("user");
-        User user = userDAO.findByEmail(loggedUser.getUsername());
-        return user;
-    }
 }
