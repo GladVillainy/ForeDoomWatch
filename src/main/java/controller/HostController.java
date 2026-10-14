@@ -59,6 +59,7 @@ public class HostController implements IController {
 
         //Få host
         HostDTO hostDTO = ctx.bodyAsClass(HostDTO.class);
+        ValidationException.requireValue(hostDTO.hostname(), "name", "Host");
         //Lav til entity
         Host host = hostMapper.toEntity(hostDTO);
         //Sæt user
@@ -77,13 +78,19 @@ public class HostController implements IController {
         long id = getLongId(ctx);
         //find hosten og lav til entity
         HostDTO hostDTO = ctx.bodyAsClass(HostDTO.class);
+
         Host host = hostDAO.read(id);
 
         //validate ownership
         ValidationException.validateOwnership(host,AuthUtil.getLoggedInUser(ctx, userDAO));
 
-        host.setHostDescription(hostDTO.hostDescription());
-        host.setHostName(hostDTO.hostname());
+        if(hostDTO.hostDescription() != null){
+            host.setHostDescription(hostDTO.hostDescription());
+        }
+        if(hostDTO.hostname() != null){
+            host.setHostName(hostDTO.hostname());
+        }
+
 
         //Update hosten og return it
         Host updatedHost = hostDAO.update(host);

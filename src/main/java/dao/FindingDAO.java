@@ -75,7 +75,7 @@ public class FindingDAO extends GenericDAO<Finding, Long> {
      * @throws DatabaseException   if the database query fails (status code 500)
      */
     public List<Finding> sortByStatusDescending(Long userId) {
-        return sortCvss(userId, Comparator.reverseOrder());
+        return sortByStatusAscending(userId).reversed();
     }
 
     /**
@@ -101,7 +101,7 @@ public class FindingDAO extends GenericDAO<Finding, Long> {
      * @throws DatabaseException   if the database query fails (status code 500)
      */
     public List<Finding> sortCvssDescending(Long userId) {
-        return sortCvssAscending(userId).reversed();
+        return sortCvss(userId, Comparator.reverseOrder());
     }
 
     /**

@@ -18,11 +18,10 @@ public class FindingRoutes {
         return () -> {
             put("/{id}/status", findingController::updateStatus, Roles.USER);
 
-            get("/user/{id}/status/asc", findingController::sortStatusByAscending, Roles.USER);
-            get("/user/{id}/status/desc", findingController::sortStatusByDescending, Roles.USER);
-            get("/user/{id}/cvss/asc", findingController::sortCvssByAscending, Roles.USER);
-            get("/user/{id}/cvss/desc", findingController::sortCvssByDescending, Roles.USER);
-
+            get("/status/asc", findingController::sortStatusByAscending, Roles.USER);
+            get("/status/desc", findingController::sortStatusByDescending, Roles.USER);
+            get("/cvss/asc", findingController::sortCvssByAscending, Roles.USER);
+            get("/cvss/desc", findingController::sortCvssByDescending, Roles.USER);
         };
     }
 }

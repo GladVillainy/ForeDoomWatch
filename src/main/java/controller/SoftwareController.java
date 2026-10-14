@@ -64,12 +64,17 @@ public class SoftwareController implements IController {
 
     @Override
     public void create(Context ctx) {
+        //validere og hent host
         long hostId = ctx.pathParamAsClass("hostId", Long.class).get();
-
         Host host = hostDAO.read(hostId);
         ValidationException.validateOwnership(host, AuthUtil.getLoggedInUser(ctx, userDAO));
 
+        //byggelse af software
         SoftwareDTO softwareDTO = ctx.bodyAsClass(SoftwareDTO.class);
+        ValidationException.requireValue(softwareDTO.softwareName(), "name", "software");
+        ValidationException.requireValue(softwareDTO.vendor(), "vendor", "software");
+        ValidationException.requireValue(softwareDTO.version(), "version", "software");
+
         Software software = softwareMapper.toEntity(softwareDTO);
         software.setHost(host);
 
@@ -88,9 +93,16 @@ public class SoftwareController implements IController {
         ValidationException.validateOwnership(software, AuthUtil.getLoggedInUser(ctx, userDAO));
 
         SoftwareDTO softwareDTO = ctx.bodyAsClass(SoftwareDTO.class);
-        software.setSoftwareName(softwareDTO.softwareName());
-        software.setVersion(softwareDTO.version());
-        software.setVendor(softwareDTO.vendor());
+
+        if (softwareDTO.softwareName() != null) {
+            software.setSoftwareName(softwareDTO.softwareName());
+        }
+        if (softwareDTO.version() != null) {
+            software.setVersion(softwareDTO.version());
+        }
+        if (softwareDTO.vendor() != null) {
+            software.setVendor(softwareDTO.vendor());
+        }
 
         Software updatedSoftware = softwareDAO.update(software);
         SoftwareDTO updatedSoftwareDTO = softwareMapper.toDTO(updatedSoftware);
