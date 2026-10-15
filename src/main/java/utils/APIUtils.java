@@ -32,8 +32,11 @@ public class APIUtils {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != HttpStatus.OK.getCode()) {
-                if(response.statusCode() == HttpStatus.TOO_MANY_REQUESTS.getCode()){
+                if (response.statusCode() == HttpStatus.TOO_MANY_REQUESTS.getCode()) {
                     throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "Rate limit have been exceeded");
+                }
+                if (response.statusCode() == HttpStatus.FORBIDDEN.getCode()) {
+                    throw new ApiException(HttpStatus.FORBIDDEN, "NVD denied the request, possible rate limit or invalid api key");
                 }
                 throw new RuntimeException("GET request failed. Status code: " + response.statusCode());
             }

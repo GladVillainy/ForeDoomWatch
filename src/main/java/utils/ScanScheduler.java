@@ -24,8 +24,9 @@ public class ScanScheduler {
     }
 
     public void start() {
+        int initialDelayInHours = 1;
         int delayInHours = 5;
-        scheduler.scheduleWithFixedDelay(this::runScan, 0, delayInHours, TimeUnit.HOURS);
+        scheduler.scheduleWithFixedDelay(this::runScan, initialDelayInHours, delayInHours, TimeUnit.HOURS);
     }
 
 
@@ -52,7 +53,6 @@ public class ScanScheduler {
             }
         } catch (Exception e) {
             logger.error("Scan run failed", e);
-            stop();
         }
     }
 
