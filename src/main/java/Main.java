@@ -46,7 +46,7 @@ public class Main {
         VulnerabilityMapper vulnerabilityMapper = new VulnerabilityMapper(referenceMapper);
         NVDMapper nvdMapper = new NVDMapper();
 
-        //NVD api 
+        //NVD api
         String apiKey = System.getenv("apiKey");
 
         //Service
