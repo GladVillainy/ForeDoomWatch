@@ -10,6 +10,11 @@ import java.util.Properties;
 public class Utils {
 
     public static String getPropertyValue(String propName, String resourceName)  {
+        String envValue = System.getenv(propName);
+        if (envValue != null && !envValue.isBlank()) {
+            return envValue.trim();
+        }
+
         try (InputStream is = Utils.class.getClassLoader().getResourceAsStream(resourceName)) {
             Properties prop = new Properties();
             prop.load(is);
