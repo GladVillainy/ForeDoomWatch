@@ -49,11 +49,6 @@ class GenericDAOTest {
         em.close();
     }
 
-    @AfterAll
-    void shutdown() {
-        emf.close();
-    }
-
 
     @Test
     void create() {

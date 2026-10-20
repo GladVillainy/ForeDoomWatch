@@ -77,7 +77,7 @@ class AuthTest {
 
     @AfterAll
     void shutdown() {
-        emf.close();
+        app.stop();
     }
 
 
