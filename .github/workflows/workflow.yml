@@ -12,13 +12,20 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
+        # ændret fra 17 til 26
         name: Set up JDK 26
         uses: actions/setup-java@v3
         with:
+          # ændret fra 17 til 26
           java-version: '26'
           distribution: 'temurin'
       -
+        # nye values
         name: Build with Maven
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ISSUER: ${{ secrets.ISSUER }}
+          TOKEN_EXPIRE_TIME: ${{ secrets.TOKEN_EXPIRE_TIME }}
         run: mvn --batch-mode --update-snapshots package
       -
         name: Login to Docker Hub
@@ -36,4 +43,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/foredoomwatch:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/foredoomwatch:latest 
