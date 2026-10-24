@@ -1,0 +1,257 @@
+@startuml klassediagram_simpel
+skinparam classAttributeIconSize 0
+hide empty members
+
+package "config" {
+  class ApplicationConfig
+  class HibernateConfig
+  class HibernateBaseProperties
+  class HibernateEmfBuilder
+  class EntityRegistry
+}
+
+package "routes" {
+  class Routes
+  class HostRoutes
+  class SoftwareRoutes
+  class FindingRoutes
+  class VulnerabilityRoutes
+}
+
+package "controller" {
+  interface IController
+  class HostController
+  class SoftwareController
+  class FindingController
+  class VulnerabilityController
+  class UserController
+}
+
+package "utils" {
+  class Service
+  class APIUtils
+  class ScanScheduler
+  class AuthUtil
+  class Utils
+}
+
+package "dao" {
+  class GenericDAO {
+    + create(t)
+    + read(id)
+    + update(t)
+    + delete(id)
+    + readAll()
+  }
+  class HostDAO
+  class SoftwareDAO
+  class FindingDAO
+  class VulnerabilityDAO
+}
+
+package "mapper" {
+  interface IMapper
+  class HostMapper
+  class SoftwareMapper
+  class FindingMapper
+  class ReferenceMapper
+  class UserMapper
+  class VulnerabilityMapper
+  class NVDMapper
+}
+
+package "dto" {
+  class HostDTO
+  class SoftwareDTO
+  class FindingDTO
+  class FindingDetailDTO
+  class ReferencesDTO
+  class VulnerabilityDTO
+  class UserDTO
+  class NVDDTO
+  class NVDVulnerabilitiesDTO
+  class NVDCveDTO
+  class NVDDescriptionDTO
+  class NVDReferenceDTO
+  class NVDMetricsDTO
+  class NVDCvssMetricV3DTO
+  class NVDCvssDataDTO
+}
+
+package "entities" {
+  interface IEntity
+  class Host {
+    - hostId
+    - hostName
+    - hostDescription
+  }
+  class Software {
+    - softwareId
+    - softwareName
+    - version
+    - vendor
+  }
+  class Finding {
+    - findingId
+    - status
+    - detectedAt
+    - updatedAt
+    - resolvedAt
+  }
+  class Vulnerability {
+    - vulnerabilityId
+    - description
+    - cweCategory
+  }
+  class Metrics {
+    - cvssScore
+    - cvssVector
+    - severity
+  }
+  class Reference {
+    - referenceId
+    - url
+    - source
+    - tags
+  }
+  enum FindingStatus {
+    OPEN
+    IN_PROGRESS
+    RESOLVED
+  }
+}
+
+class RuntimeException
+class Exception
+
+package "security" {
+  class SecurityRoutes
+  class AccessController
+  class SecurityController
+  interface ISecurityDAO
+  class UserDAO
+  class AuthDTO
+  interface ISecurityUser
+  class User {
+    - userId
+    - email
+    - username
+    - passwordHash
+    - roles
+  }
+  enum Roles {
+    ANYONE
+    USER
+    ADMIN
+  }
+  class NotAuthorizedException
+}
+
+package "exceptions" {
+  class ApiException
+  class DatabaseException
+  class EntityException
+  class ValidationException
+}
+
+' --- Entities ---
+Host          "1" *-- "0..*" Software
+Software      "1" *-- "0..*" Finding
+Vulnerability "1" *-- "0..*" Reference
+Vulnerability "1" *-- "0..1" Metrics
+Vulnerability "1" o-- "0..*" Finding
+User          "1" <-- "0..*" Host
+Finding ..> FindingStatus
+User    ..> Roles
+User    ..|> ISecurityUser
+User          ..|> IEntity
+Host          ..|> IEntity
+Software      ..|> IEntity
+Finding       ..|> IEntity
+Vulnerability ..|> IEntity
+
+' --- DAO ---
+HostDAO          --|> GenericDAO
+SoftwareDAO      --|> GenericDAO
+FindingDAO       --|> GenericDAO
+VulnerabilityDAO --|> GenericDAO
+UserDAO          --|> GenericDAO
+UserDAO ..|> ISecurityDAO
+GenericDAO ..> IEntity
+
+' --- Mapper og DTO ---
+HostMapper          ..|> IMapper
+SoftwareMapper      ..|> IMapper
+FindingMapper       ..|> IMapper
+ReferenceMapper     ..|> IMapper
+UserMapper          ..|> IMapper
+VulnerabilityMapper ..|> IMapper
+VulnerabilityMapper --> ReferenceMapper
+VulnerabilityDTO "1" *-- "0..*" ReferencesDTO
+NVDDTO                "1" *-- "0..*" NVDVulnerabilitiesDTO
+NVDVulnerabilitiesDTO "1" *-- "1" NVDCveDTO
+NVDCveDTO             "1" *-- "0..*" NVDDescriptionDTO
+NVDCveDTO             "1" *-- "0..*" NVDReferenceDTO
+NVDCveDTO             "1" *-- "0..1" NVDMetricsDTO
+NVDMetricsDTO         "1" *-- "0..*" NVDCvssMetricV3DTO
+NVDCvssMetricV3DTO    "1" *-- "1" NVDCvssDataDTO
+
+' --- Routes og controller ---
+Routes --> HostRoutes
+Routes --> SoftwareRoutes
+Routes --> FindingRoutes
+Routes --> VulnerabilityRoutes
+Routes --> SecurityRoutes
+HostRoutes          --> HostController
+SoftwareRoutes      --> SoftwareController
+FindingRoutes       --> FindingController
+VulnerabilityRoutes --> VulnerabilityController
+HostController     ..|> IController
+SoftwareController ..|> IController
+AccessController  --> SecurityController
+SecurityRoutes    --> SecurityController
+SecurityController --> ISecurityDAO
+ApplicationConfig --> Routes
+
+' --- Utils ---
+Service       --> APIUtils
+Service       --> NVDMapper
+Service       --> SoftwareDAO
+Service       --> VulnerabilityDAO
+Service       --> FindingDAO
+ScanScheduler --> Service
+ScanScheduler --> SoftwareDAO
+AuthUtil      ..> UserDAO
+APIUtils      ..> NVDDTO
+
+' --- Config ---
+HibernateConfig     ..> HibernateBaseProperties
+HibernateConfig     ..> HibernateEmfBuilder
+HibernateEmfBuilder ..> EntityRegistry
+HibernateConfig     ..> Utils
+
+' --- Exceptions ---
+ApiException           --|> RuntimeException
+DatabaseException      --|> RuntimeException
+EntityException        --|> RuntimeException
+ValidationException    --|> RuntimeException
+NotAuthorizedException --|> Exception
+
+' --- Lagdeling (pakke til pakke) ---
+"config" --> "routes"
+"routes" --> "controller"
+"routes" --> "security"
+"security" --> "dao"
+"security" --> "entities"
+"mapper" --> "security"
+"controller" --> "dao"
+"controller" --> "mapper"
+"controller" --> "utils"
+"mapper" --> "dto"
+"dao" --> "entities"
+"mapper" --> "entities"
+"dao" ..> "exceptions"
+"controller" ..> "exceptions"
+"utils" ..> "exceptions"
+"security" ..> "exceptions"
+@enduml
