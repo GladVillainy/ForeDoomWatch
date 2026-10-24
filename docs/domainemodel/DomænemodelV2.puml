@@ -1,0 +1,73 @@
+@startuml
+!pragma layout smetana
+
+class User {
+  - email
+  - username
+  - passwordHash
+  - roles : Roles [1..*]
+}
+
+class Host {
+  - hostName
+  - hostDescription
+}
+
+class Software {
+  - softwareName
+  - vendor
+  - version
+}
+
+class Finding {
+  - status : FindingStatus
+  - detectedAt
+  - updatedAt
+  - resolvedAt
+}
+
+class Vulnerability {
+  - cveId
+  - description
+  - cweCategory
+}
+
+class Metrics {
+  - cvssScore
+  - cvssVector
+  - severity
+}
+
+class Reference {
+  - url
+  - source
+  - tags
+}
+
+enum FindingStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum Roles {
+  ANYONE
+  USER
+  ADMIN
+}
+
+' --- Kompositioner (ejer-relationer) ---
+User          "1" *-- "0..*" Host          : owns >
+Host          "1" *-- "0..*" Software      : runs >
+Software      "1" *-- "0..*" Finding       : has >
+Vulnerability "1" *-- "0..*" Reference     : documented by >
+Vulnerability "1" *-- "0..1" Metrics       : scored by >
+
+' --- Aggregering (uafhængighed) ---
+Vulnerability "1" o-- "0..*" Finding       : identified in >
+
+' --- Dependencies (Bruger) ---
+Finding ..> FindingStatus
+User    ..> Roles
+
+@enduml
