@@ -5,10 +5,15 @@ import lombok.*;
 
 import java.util.List;
 
-@Entity @Setter @NoArgsConstructor
-@AllArgsConstructor @Builder @Getter
+@Entity
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Getter
 public class Software implements IEntity<Long> {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "software_id")
     private long softwareId;
 
@@ -23,8 +28,10 @@ public class Software implements IEntity<Long> {
     @OneToMany(mappedBy = "software", cascade = CascadeType.ALL)
     private List<Finding> finding;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "host_id", nullable = false)
     private Host host;
+
 
     @Override
     public Long getID() {

@@ -28,10 +28,9 @@ public class Host implements IEntity {
 
 
     //Relation
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    public void setUser(User user) {this.user = user;}
 
     @OneToMany(mappedBy = "host", cascade = CascadeType.ALL)
     private List<Software> softwareList;

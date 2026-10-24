@@ -1,11 +1,14 @@
 package security.entities;
 
+import entities.Host;
 import entities.IEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,6 +52,9 @@ public class User implements IEntity<Long>, ISecurityUser {
     public Long getID() {
         return userId;
     }
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Host> hosts;
 
 
     // ISecurity interface
