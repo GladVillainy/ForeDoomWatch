@@ -138,61 +138,86 @@ where the API and the user meet in the finding table. Finding is a table that co
 
 ---
 
-## Important Entities
+# Important Entities
 
-Briefly describe the main entities in your system.
+## User
+A user is used for distinguish between other users data, due to the properties of a login page using the attributes passwordHash and email. 
+#### Attributes
+* userId
+* username
+* email
+* passwordHash
+* roles
 
-### User
+## Software
+Software is the program installed on a host, and it is what the system scans for vulnerabilities. Its vendor, name and version are used to query the NVD API, and each match is stored as a finding.
+### Attributes
+* softwareId
+* softwareName
+* vendor
+* version
+  
+## Finding
+Finding is the bridge between the user's software and the external NVD API scans, due to its relation (seen in the ERD) between Software and Vulnerability. The entity also has properties for marking the finding with the enum attribute status, and information about the date when the finding was detected, updated and resolved.
+### Attributes
+* findingId
+* status (OPEN, IN_PROGRESS, RESOLVED)
+* detectedAt
+* updatedAt
+* resolvedAt
 
-Represents a registered user in the system.
-
-Fields:
-
-- id
-- username
-- password
-- role
-
-### Activity
-
-Represents a recorded workout activity.
-
-Fields:
-
-- id
-- userId
-- date
-- description
-
+## Vulnerability
+Vulnerability is where the program builds and stores the information, seen in the attributes, that the external API provides.
+### Attributes
+* vulnerabilityId
+* description
+* cweCategory
+* metrics (cvssScore, cvssVector, severity)
 ---
 
 # API Documentation
 
-Describe the most important endpoints.
+## Create a user
+POST /api/auth/register
 
-## Example Endpoints
+Request body: { "username": "Thomas", "email": "thomas@testmail.com", "password": "secret" }
 
-### Create User
-POST /api/users
+Response: 201 Created
 
+## Create a host
+POST /api/hosts
 
-Request body:
-{ “username”: “john”, “password”: “secret” }
+Request body: { "hostname": "Firewall", "hostDescription": "Placed U12" }
 
+Response: 201 Created
 
-Response:
-201 Created
+## Create software
+POST /api/hosts/{hostId}/software
 
+Request body: { "softwareName": "opnsense", "vendor": "opnsense", "version": "23.1" }
 
----
+Response: 201 Created
 
-### Get All Activities
-GET /api/activities
+## Scan software for vulnerabilities
+POST /api/software/{id}/scan
 
+Request body: none
 
-Response:
-[ { “id”:1, “userId”:1, “description”:“Running” } ]
+Response: 200 OK
 
+## Get findings sorted by highest CVSS score
+GET /api/findings/cvss/desc
+
+Request body: none
+
+Response: 200 OK
+
+## Edit the status of a finding
+PUT /api/findings/{id}/status
+
+Request body: { "status": "RESOLVED" }
+
+Response: 200 OK
 
 ---
 
@@ -211,13 +236,13 @@ Example:
 
 # Development Notes
 
-(Optional section)
+## Challenges 
+- NVD does not support webhooks, which was not ideal for this project, as a user often wants information as fast as possible. The alternative was to make a polling class that asks NVD's API for new information. 
 
-Here you can briefly describe important challenges or lessons learned during development.
+- Exceptions: I made custom exceptions too far into the project, which made it too time consuming to go through every method and use the new custom exceptions. I learned that custom exception classes need to be created while coding, not after the code has been written and the project is 80% finished.
 
-Examples:
+## Things I learned
+- I was introduced to Javadoc in the first semester, but never actually used it. During this project, I have used it a lot and found it practical for documenting methods and classes, even though it was sometimes hard to describe a method. I learned how to link methods together in Javadoc, and got much better at it.
 
-- Handling authentication with JWT
-- Designing the database schema
-- Structuring the service layer
-- Testing the API
+  
+
