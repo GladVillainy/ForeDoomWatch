@@ -14,8 +14,8 @@ https://gladvillainy.github.io/Portfolio/
 Project overview video (max 5 min):  
 <LINK>
 
-Deployed application (optional):  
-<LINK>
+Deployed application (No frontend yet):  
+https://foredoomwatch.buades.online/
 
 Source code repository:  
 <LINK>
@@ -30,12 +30,12 @@ The system functions like a flow, where the data flows through the layers,
 and each layer controls its own responsibilities.
 
 Like a pipeline, it starts at one spot, the endpoint, which receives the request from the user.
-Before the request reaches the controller, an access handler verifies the user’s JWT token and role.
+Before the request reaches the controller, an access handler verifies the user’s JSON Web Token(JWT) token and role.
 If the token is valid, the request is allowed into the system.
 
 Each endpoint is routed to a controller method, and the controller works like a navigator: it calls the 
 layers needed to handle the request, which keeps the flow seamless. Controllers are essential for communication,
-because they are the bridge between the view and the backend. In the view we use JSON, while the backend works with DTOs and entities.
+because they are the bridge between the view and the backend. In the view we use JSON, while the backend works with Data Transfer Object(DTO) and entities.
 
 
 The controller receives the incoming JSON as a DTO. When working with user requests, it is important to handle the data input 
@@ -50,8 +50,7 @@ Once the entities have been created, they go through the Data Access Object (DAO
 The DAO layer’s main function is communication between the backend and the database. The DAO layer stores data, and when
 needed, it is also able to retrieve data.
 
-The service layer is a layer of its own. It receives the software that needs to be scanned, retrieves it from the
-database, and calls the external API (NVD). The response is then mapped to entities, which are saved through the DAO layer.
+The service layer is a layer of its own. It receives the software to be scanned, retrieves it from the database, and calls the external National Vulnerability Database API. The response is then mapped to entities, which are saved through the DAO layer.
 
 ## Architecture Diagram
 
@@ -205,7 +204,7 @@ Request body: none
 
 Response: 200 OK
 
-## Get findings sorted by highest CVSS score
+## Get findings sorted by highest common vulnerability scoring System(CVSS) score
 GET /api/findings/cvss/desc
 
 Request body: none
@@ -223,14 +222,13 @@ Response: 200 OK
 
 # User Stories
 
-List the most important user stories for the project.
+1. As a user, I want to create an account, so that my assets and findings are saved and tied to me.
 
-Example:
+3. As a user, I want to add software with a name and version to a specific machine, so that the system knows what is running where.
 
-- As a user, I want to register an account.
-- As a user, I want to log in and receive a token.
-- As a user, I want to record a workout activity.
-- As a user, I want to view my activity history.
+6. As a user, I want the system to look up my software against National Vulnerability Database(NVD), so that I find out whether there are known common vulnerabilities and exposures(CVE}.
+
+8. As a user, I want to see all my open findings across machines sorted by severity, so that I know what to tackle first.
 
 ---
 
