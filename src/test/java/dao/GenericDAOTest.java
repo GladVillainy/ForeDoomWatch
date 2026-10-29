@@ -77,6 +77,7 @@ class GenericDAOTest {
 
         //Testing new host
         Host host1 = new Host("Maskine1", "Firewall");
+        host1.setUser(user1);
 
         hostDAO.create(host1);
         host1.getHostId();
@@ -87,6 +88,7 @@ class GenericDAOTest {
         //Testing a new host
         Host host2 = new Host("Maskine2", "osint");
 
+        host2.setUser(user2);
         hostDAO.create(host2);
         host2.getHostId();
         assertThat(host2.getHostId(), notNullValue());
