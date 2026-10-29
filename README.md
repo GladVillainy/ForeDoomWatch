@@ -20,7 +20,7 @@ Deployed application (No frontend yet):
 https://foredoomwatch.buades.online/
 
 Source code repository:  
-<LINK>
+https://github.com/GladVillainy/ForeDoomWatch/tree/main/src
 
 ---
 
