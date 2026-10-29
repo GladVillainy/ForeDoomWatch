@@ -4,6 +4,8 @@ import dao.HostDAO;
 import dk.bugelhartmann.UserDTO;
 import dto.HostDTO;
 import entities.Host;
+import exceptions.ApiException;
+import exceptions.DatabaseException;
 import exceptions.ValidationException;
 import io.javalin.http.HttpStatus;
 import mapper.HostMapper;
@@ -32,7 +34,12 @@ public class HostController implements IController {
         //hent user
         User user = AuthUtil.getLoggedInUser(ctx, userDAO);
 
-        List<Host> hostList = hostDAO.findByUserId(user.getID());
+        List<Host> hostList;
+        try {
+            hostList = hostDAO.findByUserId(user.getID());
+        } catch (DatabaseException e){
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not get hosts");
+        }
 
         List<HostDTO> hostDTOList = hostMapper.toDTOList(hostList);
 

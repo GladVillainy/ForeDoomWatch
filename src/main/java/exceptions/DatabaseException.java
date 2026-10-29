@@ -23,6 +23,17 @@ public class DatabaseException extends RuntimeException {
         this.code = code;
         logger.error("DatabaseException (code={}): {}", code, msg);
     }
+
+    /**
+     * How a database exception should look.
+     * @param msg the message
+     * @param cause the cause from the caught exception
+     */
+    public DatabaseException( String msg, Throwable cause ){
+        super(msg, cause);
+        logger.error("DatabaseException: {}", msg, cause);
+    }
+
     public HttpStatus getCode(){
         return code;
     }

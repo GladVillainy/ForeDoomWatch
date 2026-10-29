@@ -33,8 +33,7 @@
                     List<Host> resultList = query.getResultList();
                     return resultList;
                 } catch (PersistenceException e) {
-                    throw new DatabaseException(HttpStatus.INTERNAL_SERVER_ERROR, "Get Host " +
-                            "has failed with error message" + e.getMessage());
+                    throw new DatabaseException("Get host failed", e);
                 }
             }
         }

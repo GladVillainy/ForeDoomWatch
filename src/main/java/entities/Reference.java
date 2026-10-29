@@ -19,5 +19,4 @@ public class Reference {
     @JoinColumn(name = "vulnerability_id")
     private Vulnerability vulnerability;
 
-
 }
