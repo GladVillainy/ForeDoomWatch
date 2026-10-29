@@ -1,0 +1,42 @@
+@url = localhost:7070/api
+@token =
+
+### Test af oprettelse af bruger, 201
+POST http://{{url}}/auth/register
+Content-Type: application/json
+
+{ "username": "thomas", "email": "thomas@testmail2.com", "password": "secret" }
+
+
+### Test af oprettelse af host, 201
+POST http://{{url}}/hosts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "hostname": "Firewall", "hostDescription": "Placed U12" }
+
+
+### Test af oprettelse af software på host, 201
+POST http://{{url}}/hosts/1/software
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "softwareName": "opnsense", "vendor": "opnsense", "version": "23.1" }
+
+
+### Test af scan af software, 200
+POST http://{{url}}/software/1/scan
+Authorization: Bearer {{token}}
+
+
+### Test af findings sorteret efter højeste CVSS, 200
+GET http://{{url}}/findings/cvss/desc
+Authorization: Bearer {{token}}
+
+
+### Test af ændring af status på finding, 200
+PUT http://{{url}}/findings/1/status
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "status": "RESOLVED" }
