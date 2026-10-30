@@ -13,9 +13,6 @@ against the NVD on a schedule and presents prioritized findings, so security tea
 Portfolio website:  
 https://gladvillainy.github.io/Portfolio/
 
-Project overview video (max 5 min):  
-<LINK>
-
 Deployed application (No frontend yet):  
 https://foredoomwatch.buades.online/
 
@@ -335,8 +332,14 @@ Response: 200 OK
 
 - Exceptions: I made custom exceptions too far into the project, which made it too time consuming to go through every method and use the new custom exceptions. I learned that custom exception classes need to be created while coding, not after the code has been written and the project is 80% finished.
 
+- Working alone was hard, mainly because I had no one to push back on my ideas. I missed having a second opinion, and I fell into tunnel vision. As the codebase grew, it became large and overwhelming, and I had to keep track of everything myself. I am convinced this has affected my code and its structure in a negative way, without me being aware of it. One example is that I placed HTTP status codes in the DAO layer, which couples the DAO to the web layer and breaks the Separation of Concerns principle I describe in the architecture section. A second person might have caught this early. I have always been someone who loved working alone, but I can feel that going forward I would prefer some kind of partner to talk things through with, especially on big projects.
+
 ## Things I learned
 - I was introduced to Javadoc in the first semester, but never actually used it. During this project, I have used it a lot and found it practical for documenting methods and classes, even though it was sometimes hard to describe a method. I learned how to link methods together in Javadoc, and got much better at it.
+
+- I found generic classes very useful. With GenericDAO<T, ID> and IMapper<E, Out, In>, I only had to write the CRUD operations and the mapper contract once, and could reuse them for all entities. I want to practice generics more, so I can use them with more confidence in future projects.
+
+- JPA and Hibernate: It was confusing to figure out where and how to place the relationships between entities, for example between Host and Software. I had to understand where to place the relationship. Even so, I found it very smart, and I could see the point of writing code this way, because Hibernate creates the tables and foreign keys from the entities, so I work with objects instead of writing SQL for every relation or manual making the tables in the database.
 
   
 
