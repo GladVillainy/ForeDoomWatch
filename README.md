@@ -192,6 +192,7 @@ Response body:
   "username": "thomas",
   "email": "thomas@testmail.com"
 }
+
 Http Status code: 201 Created
 
 ## Create a host
@@ -203,6 +204,7 @@ Response body:
   "hostname": "Firewall",
   "hostDescription": "Placed U12"
 }
+
 Http status code: 201 Created
 
 ## Create software
