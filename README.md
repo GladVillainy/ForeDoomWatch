@@ -339,7 +339,5 @@ Response: 200 OK
 
 - I found generic classes very useful. With GenericDAO<T, ID> and IMapper<E, Out, In>, I only had to write the CRUD operations and the mapper contract once, and could reuse them for all entities. I want to practice generics more, so I can use them with more confidence in future projects.
 
-- JPA and Hibernate: It was confusing to figure out where and how to place the relationships between entities, for example between Host and Software. I had to understand where to place the relationship. Even so, I found it very smart, and I could see the point of writing code this way, because Hibernate creates the tables and foreign keys from the entities, so I work with objects instead of writing SQL for every relation or manual making the tables in the database.
-
-  
+- JPA and Hibernate: It was confusing to figure out where and how to place the relationships between entities, for example between Host and Software. My issue was not understanding what a relationship is, but where and how to place it in the code. This led to a mistake: at one point, Host had two foreign keys to Software. Even so, I found it very smart, and I could see the point of writing code this way. Hibernate creates the tables and foreign keys from the entities, so I work with objects instead of writing SQL for every relation or creating the tables manually in the database. As with most new technology, making mistakes was a natural part of learning it and understanding it.
 
